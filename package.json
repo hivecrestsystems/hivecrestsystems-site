@@ -1,0 +1,33 @@
+{
+  "name": "hivecrest-site",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Website for Hivecrest Systems LLC (hivecrestsystems.com)",
+  "type": "module",
+  "engines": {
+    "node": ">=22.23.4"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "test": "npm run build && npm run test:html && npm run test:browsers && npm run test:lighthouse",
+    "test:html": "html-validate \"dist/**/*.html\"",
+    "test:browsers": "node scripts/run-playwright.mjs",
+    "test:visual": "node scripts/run-playwright.mjs --project=visual",
+    "test:visual:update": "node scripts/run-playwright.mjs --project=visual --update-snapshots",
+    "test:lighthouse": "lhci autorun",
+    "test:report": "playwright show-report",
+    "branches:prune": "bash scripts/prune-branches.sh",
+    "release:tag": "bash scripts/tag-release.sh"
+  },
+  "dependencies": {
+    "astro": "7.4.13"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
+    "@lhci/cli": "0.16.1",
+    "@playwright/test": "1.65.0",
+    "html-validate": "11.21.1"
+  }
+}
