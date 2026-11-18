@@ -1,0 +1,35 @@
+/* Hivecrest Systems design tokens */
+:root {
+  /* Brand */
+  --hc-charcoal: #18181B;
+  --hc-honey: #E39A2B;
+  --hc-paper: #F6F5F1;
+  --hc-night: #141416;
+  --hc-stone: #5F5E5A;
+
+  /* Supporting */
+  --hc-light-text: #EDEBE4;
+  --hc-muted-on-dark: #A3A29C;
+  --hc-soft-on-dark: #C9C7BF;
+  --hc-body-gray: #3A3A3F;
+  --hc-card-border: #E2E0D8;
+  --hc-sand: #ECEAE3;
+  --hc-white: #FFFFFF;
+
+  /* Type */
+  --hc-font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --hc-font-sans: Inter, system-ui, sans-serif;
+
+  /* Shape */
+  --hc-radius-sm: 8px;
+  --hc-radius-md: 12px;
+  --hc-radius-lg: 16px;
+  --hc-max-width: 1200px;
+}
+
+/* Self-hosted fonts (copy brand/fonts into the site to use these) */
+@font-face { font-family: 'Inter'; font-weight: 400; font-style: normal; font-display: swap; src: url('fonts/inter-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Inter'; font-weight: 500; font-style: normal; font-display: swap; src: url('fonts/inter-latin-500-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Inter'; font-weight: 600; font-style: normal; font-display: swap; src: url('fonts/inter-latin-600-normal.woff2') format('woff2'); }
+@font-face { font-family: 'JetBrains Mono'; font-weight: 500; font-style: normal; font-display: swap; src: url('fonts/jetbrains-mono-latin-500-normal.woff2') format('woff2'); }
+@font-face { font-family: 'JetBrains Mono'; font-weight: 800; font-style: normal; font-display: swap; src: url('fonts/jetbrains-mono-latin-800-normal.woff2') format('woff2'); }
