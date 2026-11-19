@@ -50,6 +50,7 @@ public/assets/               Favicons, social preview image, logos (copied to th
 brand/                       Brand guide, design tokens, logo files and fonts (the site's fonts are served from here)
 tests/                       Browser tests and baseline screenshots
 scripts/                     Test runner, branch pruning and release tagging
+wrangler.jsonc               Cloudflare hosting settings (see Hosting below)
 ```
 
 Read `brand/BRAND.md` before making any visual change.
@@ -65,6 +66,19 @@ Read `brand/BRAND.md` before making any visual change.
 7. Run `npm run branches:prune` to keep only the three most recent iteration branches.
 
 `main` and `dev` are protected: changes reach them only through reviewed pull requests with passing checks.
+
+## Hosting
+
+The site is served by two Cloudflare Workers that serve only static files, with no Worker code. Cloudflare's Workers Builds builds each one from this repository with `npm run build`. Settings are in `wrangler.jsonc`.
+
+| Worker | Built from | Deploy command | Serves |
+|---|---|---|---|
+| `hivecrest-site` | `main` | `npx wrangler deploy --env=""` | hivecrestsystems.com |
+| `hivecrest-site-dev` | `dev` | `npx wrangler deploy --env dev` | dev.hivecrestsystems.com |
+
+- **Pull request previews:** pull request branches build a preview on `hivecrest-site-dev` with `npx wrangler preview --env dev`. Cloudflare posts the preview link on the pull request.
+- **Access:** dev.hivecrestsystems.com and the preview links sit behind Cloudflare Access. Only approved email addresses can sign in.
+- **Addresses:** pages are served at clean addresses (`/privacy`), and `.html` addresses redirect to them. The local test server does the same.
 
 ## Known issues
 

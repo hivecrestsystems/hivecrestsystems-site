@@ -39,8 +39,17 @@ async function resolveFile(urlPath) {
 }
 
 createServer(async (req, res) => {
-  const { pathname } = new URL(req.url ?? '/', 'http://localhost');
-  const file = await resolveFile(pathname);
+  const { pathname, search } = new URL(req.url ?? '/', 'http://localhost');
+  // Like Cloudflare's default HTML handling (assets.html_handling in wrangler.jsonc):
+  // pages are served at clean addresses, so /privacy serves privacy.html, and
+  // .html addresses redirect there (/privacy.html to /privacy, /index.html to /).
+  if (pathname.endsWith('.html') && (await resolveFile(pathname))) {
+    res.writeHead(307, { location: pathname.replace(/(index)?\.html$/, '') + search });
+    res.end();
+    return;
+  }
+  const file =
+    (await resolveFile(pathname)) ?? (extname(pathname) ? null : await resolveFile(`${pathname}.html`));
   if (!file) {
     const notFound = await resolveFile('/404.html');
     res.writeHead(404, { 'content-type': types['.html'] });
