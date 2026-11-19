@@ -44,7 +44,7 @@ src/
   layouts/BaseLayout.astro   Shared <head>: title, description, social preview, icons, font preloads
   pages/index.astro          Homepage
   pages/privacy.astro        Privacy policy
-  components/                Site logo, crest icon, hero honeycomb, footer bar
+  components/                Site logo, crest icon, hero honeycomb (drawings and motion), footer bar
   styles/site.css            All site styles, built on the brand tokens
 public/assets/               Favicons, social preview image, logos (copied to the site as-is)
 brand/                       Brand guide, design tokens, logo files and fonts (the site's fonts are served from here)
