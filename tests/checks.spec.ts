@@ -281,3 +281,77 @@ test.describe('hero honeycomb placement', () => {
     }
   });
 });
+
+test.describe('hero honeycomb motion', () => {
+  type Box = { x: number; y: number; width: number; height: number };
+  const middle = (b: Box | null) => ({ x: b!.x + b!.width / 2, y: b!.y + b!.height / 2 });
+  const near = (a: { x: number; y: number }, b: { x: number; y: number }) => Math.hypot(a.x - b.x, a.y - b.y) < 3;
+
+  async function openDesktop(page: Page, reducedMotion: 'reduce' | 'no-preference') {
+    // Tall enough to show the top of the Services section below the hero.
+    await page.setViewportSize({ width: 1440, height: 1400 });
+    await page.emulateMedia({ reducedMotion });
+    await page.goto('/');
+    const comb = page.locator('.hero-honeycomb');
+    return {
+      honey: async () => middle(await comb.locator('.hc-honey').boundingBox()),
+      home: middle(await comb.locator('.hc-cell--home').boundingBox()),
+      // The top-left cell of the cluster.
+      cell: middle(await comb.locator('.hc-cell').first().boundingBox()),
+      // A point on the headline, which is not over any cell.
+      text: middle(await page.locator('.hero__title-line').first().boundingBox()),
+    };
+  }
+
+  test('with a mouse, the honey cell follows the pointer only over cells, then glides home', SMOKE, async ({ page, isMobile }) => {
+    test.skip(isMobile, 'Phones have no mouse pointer.');
+    const hero = await openDesktop(page, 'no-preference');
+
+    await page.mouse.move(hero.text.x, hero.text.y);
+    await page.waitForTimeout(300);
+    expect(near(await hero.honey(), hero.home), 'stays home while the pointer is on text').toBe(true);
+
+    await page.mouse.move(hero.cell.x, hero.cell.y);
+    await expect.poll(async () => near(await hero.honey(), hero.cell), { message: 'moves to the cell under the pointer' }).toBe(true);
+
+    await page.mouse.move(hero.text.x, hero.text.y);
+    await expect.poll(async () => near(await hero.honey(), hero.home), { message: 'glides home after the pointer leaves the cells' }).toBe(true);
+
+    // Moving out of the hero (onto the Services section) also sends it home.
+    await page.mouse.move(hero.cell.x, hero.cell.y);
+    await expect.poll(async () => near(await hero.honey(), hero.cell)).toBe(true);
+    const services = middle(await page.locator('#services .section-title').boundingBox());
+    await page.mouse.move(services.x, services.y);
+    await expect.poll(async () => near(await hero.honey(), hero.home), { message: 'goes home when the pointer leaves the hero' }).toBe(true);
+  });
+
+  test('with reduced motion, the honey cell stays home', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'Phones have no mouse pointer.');
+    const hero = await openDesktop(page, 'reduce');
+    await page.mouse.move(hero.cell.x, hero.cell.y);
+    await page.waitForTimeout(800);
+    expect(near(await hero.honey(), hero.home)).toBe(true);
+  });
+
+  test.describe('on touch screens', () => {
+    test.skip(({ browserName }) => browserName === 'firefox', 'Playwright cannot emulate touch in Firefox.');
+    test.use({ hasTouch: true });
+
+    test('a tap on a cell moves the honey cell there, and it stays', SMOKE, async ({ page }) => {
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.emulateMedia({ reducedMotion: 'no-preference' });
+      await page.goto('/');
+      const strip = page.locator('.hero-strip');
+      await strip.scrollIntoViewIfNeeded();
+      const honey = async () => middle(await strip.locator('.hc-honey').boundingBox());
+      const home = middle(await strip.locator('.hc-cell--home').boundingBox());
+      // Two cells to the left of home, in the same row (cells are 48.5px apart).
+      const target = { x: home.x - 97, y: home.y };
+
+      await page.touchscreen.tap(target.x, target.y);
+      await expect.poll(async () => near(await honey(), target), { message: 'moves to the tapped cell' }).toBe(true);
+      await page.waitForTimeout(1200);
+      expect(near(await honey(), target), 'stays on the tapped cell').toBe(true);
+    });
+  });
+});

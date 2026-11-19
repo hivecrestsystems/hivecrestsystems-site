@@ -2,12 +2,34 @@
 // Decorative honeycomb behind the homepage hero. The honey-outlined cell is the "crest".
 // Two drawings: a cluster for tablets and desktops, and a strip along the bottom of
 // the hero for phones. site.css shows one or the other.
+// Each drawing has grey cells (.hc-cell), one of them the home cell, and the honey
+// outline (.hc-honey) drawn over the home cell. The script below moves the outline.
+
+// Cluster, in a 100 x 100 drawing.
+const CLUSTER_CELLS = [
+  '40.00,10.80 47.97,15.40 47.97,24.60 40.00,29.20 32.03,24.60 32.03,15.40',
+  '57.32,10.80 65.29,15.40 65.29,24.60 57.32,29.20 49.35,24.60 49.35,15.40',
+  '74.64,10.80 82.61,15.40 82.61,24.60 74.64,29.20 66.67,24.60 66.67,15.40',
+  '31.34,25.80 39.31,30.40 39.31,39.60 31.34,44.20 23.37,39.60 23.37,30.40',
+  '48.66,25.80 56.63,30.40 56.63,39.60 48.66,44.20 40.69,39.60 40.69,30.40',
+  '83.30,25.80 91.27,30.40 91.27,39.60 83.30,44.20 75.33,39.60 75.33,30.40',
+  '40.00,40.80 47.97,45.40 47.97,54.60 40.00,59.20 32.03,54.60 32.03,45.40',
+  '57.32,40.80 65.29,45.40 65.29,54.60 57.32,59.20 49.35,54.60 49.35,45.40',
+  '74.64,40.80 82.61,45.40 82.61,54.60 74.64,59.20 66.67,54.60 66.67,45.40',
+  '91.96,40.80 99.93,45.40 99.93,54.60 91.96,59.20 83.99,54.60 83.99,45.40',
+  '48.66,55.80 56.63,60.40 56.63,69.60 48.66,74.20 40.69,69.60 40.69,60.40',
+  '65.98,55.80 73.95,60.40 73.95,69.60 65.98,74.20 58.01,69.60 58.01,60.40',
+  '83.30,55.80 91.27,60.40 91.27,69.60 83.30,74.20 75.33,69.60 75.33,60.40',
+  '57.32,70.80 65.29,75.40 65.29,84.60 57.32,89.20 49.35,84.60 49.35,75.40',
+  '74.64,70.80 82.61,75.40 82.61,84.60 74.64,89.20 66.67,84.60 66.67,75.40',
+];
+const CLUSTER_HOME = '65.98,25.80 73.95,30.40 73.95,39.60 65.98,44.20 58.01,39.60 58.01,30.40';
 
 // Phone strip: rows of pointy-top cells, each about 45px wide so it can be tapped.
 const R = 28; // cell radius in px
 const ROWS = 3;
 const COLS = 15; // wide enough for any phone; the header crops the rest
-const HONEY = { row: 1, col: 12 }; // about 120px in from the right edge
+const HOME = { row: 1, col: 12 }; // about 120px in from the right edge
 const COL_STEP = Math.sqrt(3) * R;
 const ROW_STEP = 1.5 * R;
 const stripWidth = +(COLS * COL_STEP + COL_STEP / 2).toFixed(1);
@@ -21,35 +43,130 @@ function hexPoints(cx: number, cy: number) {
 }
 
 const stripCells = [];
-let honeyPoints = '';
 for (let row = 0; row < ROWS; row++) {
   for (let col = 0; col < COLS; col++) {
-    const points = hexPoints((col + 0.5) * COL_STEP + (row % 2 ? COL_STEP / 2 : 0), R + row * ROW_STEP);
-    if (row === HONEY.row && col === HONEY.col) honeyPoints = points;
-    // The top row is fainter, so the strip fades upward into the hero.
-    else stripCells.push({ points, opacity: [0.5, 0.8, 1][row] });
+    stripCells.push({
+      points: hexPoints((col + 0.5) * COL_STEP + (row % 2 ? COL_STEP / 2 : 0), R + row * ROW_STEP),
+      home: row === HOME.row && col === HOME.col,
+      // The top row is fainter, so the strip fades upward into the hero.
+      opacity: [0.5, 0.8, 1][row],
+    });
   }
 }
+const stripHome = stripCells.find((c) => c.home)!.points;
 ---
 <svg class="hero-honeycomb" viewBox="0 0 100 100" aria-hidden="true">
-<polygon points="40.00,10.80 47.97,15.40 47.97,24.60 40.00,29.20 32.03,24.60 32.03,15.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="57.32,10.80 65.29,15.40 65.29,24.60 57.32,29.20 49.35,24.60 49.35,15.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="74.64,10.80 82.61,15.40 82.61,24.60 74.64,29.20 66.67,24.60 66.67,15.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="31.34,25.80 39.31,30.40 39.31,39.60 31.34,44.20 23.37,39.60 23.37,30.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="48.66,25.80 56.63,30.40 56.63,39.60 48.66,44.20 40.69,39.60 40.69,30.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="83.30,25.80 91.27,30.40 91.27,39.60 83.30,44.20 75.33,39.60 75.33,30.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="40.00,40.80 47.97,45.40 47.97,54.60 40.00,59.20 32.03,54.60 32.03,45.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="57.32,40.80 65.29,45.40 65.29,54.60 57.32,59.20 49.35,54.60 49.35,45.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="74.64,40.80 82.61,45.40 82.61,54.60 74.64,59.20 66.67,54.60 66.67,45.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="91.96,40.80 99.93,45.40 99.93,54.60 91.96,59.20 83.99,54.60 83.99,45.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="48.66,55.80 56.63,60.40 56.63,69.60 48.66,74.20 40.69,69.60 40.69,60.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="65.98,55.80 73.95,60.40 73.95,69.60 65.98,74.20 58.01,69.60 58.01,60.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="83.30,55.80 91.27,60.40 91.27,69.60 83.30,74.20 75.33,69.60 75.33,60.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="57.32,70.80 65.29,75.40 65.29,84.60 57.32,89.20 49.35,84.60 49.35,75.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="74.64,70.80 82.61,75.40 82.61,84.60 74.64,89.20 66.67,84.60 66.67,75.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="65.98,25.80 73.95,30.40 73.95,39.60 65.98,44.20 58.01,39.60 58.01,30.40" fill="none" stroke="#E39A2B" stroke-width="0.6"></polygon>
+{CLUSTER_CELLS.map((points) => <polygon class="hc-cell" points={points} fill="none" stroke="#34343A" stroke-width="0.35"></polygon>)}
+<polygon class="hc-cell hc-cell--home" points={CLUSTER_HOME} fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
+<polygon class="hc-honey" points={CLUSTER_HOME} fill="none" stroke="#E39A2B" stroke-width="0.6"></polygon>
 </svg>
 <svg class="hero-strip" width={stripWidth} height={stripHeight} viewBox={`0 0 ${stripWidth} ${stripHeight}`} aria-hidden="true">
-{stripCells.map((c) => <polygon points={c.points} fill="none" stroke="#34343A" stroke-width="1.5" opacity={c.opacity}></polygon>)}
-<polygon points={honeyPoints} fill="none" stroke="#E39A2B" stroke-width="2"></polygon>
+{stripCells.map((c) => <polygon class:list={['hc-cell', { 'hc-cell--home': c.home }]} points={c.points} fill="none" stroke="#34343A" stroke-width="1.5" opacity={c.opacity}></polygon>)}
+<polygon class="hc-honey" points={stripHome} fill="none" stroke="#E39A2B" stroke-width="2"></polygon>
 </svg>
+
+<script>
+  // Honeycomb motion. With a mouse, the honey outline hops to the cell under the
+  // pointer (only when the pointer is exactly over a cell), the cell it left glows
+  // and fades, and it glides home 0.7s after the pointer leaves the cells. On touch
+  // screens it follows taps on a cell and stays there. Nothing moves with reduced motion.
+  const HOME_DELAY_MS = 700;
+  const header = document.querySelector<HTMLElement>('.site-header');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  type Cell = { el: SVGPolygonElement; points: number[][]; x: number; y: number };
+
+  function makeComb(svg: SVGSVGElement) {
+    const honey = svg.querySelector<SVGPolygonElement>('.hc-honey')!;
+    const cells: Cell[] = [...svg.querySelectorAll<SVGPolygonElement>('.hc-cell')].map((el) => {
+      const points = el.getAttribute('points')!.trim().split(/\s+/).map((p) => p.split(',').map(Number));
+      const x = points.reduce((sum, p) => sum + p[0], 0) / points.length;
+      const y = points.reduce((sum, p) => sum + p[1], 0) / points.length;
+      return { el, points, x, y };
+    });
+    const home = cells.find((c) => c.el.classList.contains('hc-cell--home'))!;
+    let current = home;
+    let homeTimer = 0;
+
+    // Ray-casting point-in-polygon test, in the drawing's own units.
+    const inside = (x: number, y: number, pts: number[][]) => {
+      let hit = false;
+      for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+        const [xi, yi] = pts[i];
+        const [xj, yj] = pts[j];
+        if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) hit = !hit;
+      }
+      return hit;
+    };
+
+    return {
+      shown: () => getComputedStyle(svg).display !== 'none',
+      cellAt(clientX: number, clientY: number) {
+        const ctm = svg.getScreenCTM();
+        if (!ctm) return null;
+        const p = new DOMPoint(clientX, clientY).matrixTransform(ctm.inverse());
+        return cells.find((c) => inside(p.x, p.y, c.points)) ?? null;
+      },
+      hopTo(cell: Cell | null) {
+        if (!cell) return;
+        clearTimeout(homeTimer);
+        homeTimer = 0;
+        if (cell === current) return;
+        // The cell the outline just left glows honey, then fades (see .hc-cell in site.css).
+        const left = current.el;
+        left.style.transition = 'none';
+        left.style.stroke = '#E39A2B';
+        left.style.strokeOpacity = '0.55';
+        left.getBoundingClientRect();
+        requestAnimationFrame(() => {
+          left.style.transition = '';
+          left.style.stroke = '';
+          left.style.strokeOpacity = '';
+        });
+        current = cell;
+        honey.style.transform = `translate(${cell.x - home.x}px, ${cell.y - home.y}px)`;
+      },
+      goHomeSoon() {
+        if (current === home || homeTimer) return;
+        homeTimer = window.setTimeout(() => this.hopTo(home), HOME_DELAY_MS);
+      },
+      goHomeNow() {
+        this.hopTo(home);
+      },
+    };
+  }
+
+  const combs = [...document.querySelectorAll<SVGSVGElement>('.hero-honeycomb, .hero-strip')].map(makeComb);
+  const shownComb = () => combs.find((c) => c.shown());
+
+  if (header && combs.length > 0) {
+    // Mouse: follow the pointer only while it is over a cell, checked once per frame.
+    let pending: PointerEvent | null = null;
+    let frame = 0;
+    header.addEventListener('pointermove', (event) => {
+      if (event.pointerType !== 'mouse' || reduceMotion.matches) return;
+      pending = event;
+      frame ||= requestAnimationFrame(() => {
+        frame = 0;
+        const comb = shownComb();
+        if (!comb || !pending) return;
+        const cell = comb.cellAt(pending.clientX, pending.clientY);
+        if (cell) comb.hopTo(cell);
+        else comb.goHomeSoon();
+      });
+    });
+    header.addEventListener('pointerleave', (event) => {
+      pending = null;
+      if (event.pointerType === 'mouse' && !reduceMotion.matches) shownComb()?.goHomeNow();
+    });
+
+    // Touch and pen: a tap on a cell moves the outline there. Taps count when the finger
+    // lifts; a finger that starts scrolling is cancelled by the browser and never lifts here.
+    header.addEventListener('pointerup', (event) => {
+      if (event.pointerType === 'mouse' || reduceMotion.matches) return;
+      if ((event.target as Element).closest('a, button')) return;
+      const comb = shownComb();
+      comb?.hopTo(comb.cellAt(event.clientX, event.clientY));
+    });
+  }
+</script>

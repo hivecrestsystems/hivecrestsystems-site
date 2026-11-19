@@ -263,6 +263,14 @@ body {
   pointer-events: none;
 }
 .hero-strip { display: none; }
+/* Motion (script in HeroHoneycomb.astro): the honey outline glides between cells,
+   and the cell it left fades back from honey to grey. */
+.hc-honey { transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.hc-cell { transition: stroke 1.4s ease-out, stroke-opacity 1.4s ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  .hc-honey,
+  .hc-cell { transition: none; }
+}
 @media (min-width: 720px) and (max-width: 1199px) {
   :root { --hero-comb-size: clamp(360px, 46vw, 480px); }
   .hero-honeycomb {
