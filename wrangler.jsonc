@@ -1,32 +1,48 @@
 // Cloudflare Workers hosting. Workers Builds builds this repo with `npm run build`
-// and serves the static files in dist/. There is no Worker script.
+// and serves the static files in dist/. The Worker script (worker/index.ts) only
+// handles the portfolio form at /api/portfolio.
 //
 //   hivecrest-site       built from main, serves hivecrestsystems.com
 //                        deploy: npx wrangler deploy --env=""  (the top level below; no previews)
 //   hivecrest-site-dev   built from dev, serves dev.hivecrestsystems.com (private, Cloudflare Access)
 //                        deploy: npx wrangler deploy --env dev
 //                        pull request branches: npx wrangler preview --env dev
+//
+// Secrets, set in the Cloudflare dashboard for each Worker (and its Previews Base):
+//   FORM_TO               address that receives portfolio requests (a verified Email Routing destination)
+//   TURNSTILE_SECRET_KEY  Turnstile secret for the form's widget
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "hivecrest-site",
+  "main": "worker/index.ts",
   "compatibility_date": "2026-11-18",
   "assets": {
     "directory": "./dist",
+    "binding": "ASSETS",
     // Clean addresses: /privacy serves privacy.html, and /privacy.html redirects to /privacy.
-    "html_handling": "auto-trailing-slash"
+    "html_handling": "auto-trailing-slash",
+    // Pages are served straight from dist/; only the form endpoint runs the Worker first.
+    "run_worker_first": ["/api/*"]
   },
   "routes": [{ "pattern": "hivecrestsystems.com", "custom_domain": true }],
   // Only our own domains serve the site, never a *.workers.dev address.
   "workers_dev": false,
   "preview_urls": false,
-  // Required for Previews. Empty because the site has no bindings or variables.
+  "vars": { "SITE_ENV": "production" },
+  "send_email": [{ "name": "EMAIL" }],
   "previews": {},
   "env": {
     "dev": {
       "routes": [{ "pattern": "dev.hivecrestsystems.com", "custom_domain": true }],
       "workers_dev": false,
       // Pull request previews are served on workers.dev, behind Cloudflare Access.
-      "preview_urls": true
+      "preview_urls": true,
+      "vars": { "SITE_ENV": "dev" },
+      "send_email": [{ "name": "EMAIL" }],
+      "previews": {
+        "vars": { "SITE_ENV": "preview" },
+        "send_email": [{ "name": "EMAIL" }]
+      }
     }
   }
 }

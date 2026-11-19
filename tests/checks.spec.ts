@@ -116,20 +116,67 @@ for (const p of PAGES) {
   });
 }
 
+// Stands in for Cloudflare Turnstile and the /api/portfolio Worker (worker/portfolio.ts,
+// which has its own tests), so the form tests run offline and never send email.
+async function fakeFormBackend(page: Page, reply: { status: number; delayMs?: number } = { status: 200 }) {
+  const sent: Record<string, unknown>[] = [];
+  await page.route('https://challenges.cloudflare.com/**', (route) =>
+    route.fulfill({
+      contentType: 'text/javascript',
+      body: `(() => {
+        let issue;
+        window.turnstile = {
+          render(container, options) {
+            issue = () => setTimeout(() => options.callback('test-token'), 20);
+            issue();
+            return 'widget-1';
+          },
+          reset() { issue(); },
+        };
+        window.onHivecrestTurnstile();
+      })();`,
+    }),
+  );
+  await page.route('**/api/portfolio', async (route) => {
+    sent.push(route.request().postDataJSON());
+    if (reply.delayMs) await new Promise((resolve) => setTimeout(resolve, reply.delayMs));
+    await route.fulfill({ status: reply.status, json: { ok: reply.status === 200 } });
+  });
+  return sent;
+}
+
+async function fillPortfolioForm(page: Page) {
+  await page.getByLabel('Name').fill('Test Person');
+  await page.getByLabel('Work email').fill('test@example.com');
+  await page.getByLabel('What are you planning?').selectOption('AI or workflow automation');
+  await page.getByLabel('Anything else we should know? (optional)').fill('A short note.');
+}
+
 test.describe('home page behaviour', () => {
-  test('portfolio form shows the thank-you message and can be reset', SMOKE, async ({ page }) => {
+  test('portfolio form sends the request, then thanks the visitor and can be reset', SMOKE, async ({ page }) => {
+    const sent = await fakeFormBackend(page, { status: 200, delayMs: 400 });
     await page.goto('/');
     const form = page.locator('#portfolio-form');
     const thanks = page.locator('#pf-thanks');
+    const submit = page.getByRole('button', { name: 'Send me examples' });
 
-    await page.getByLabel('Name').fill('Test Person');
-    await page.getByLabel('Work email').fill('test@example.com');
-    await page.getByLabel('What are you planning?').selectOption('AI or workflow automation');
-    await page.getByRole('button', { name: 'Send me examples' }).click();
+    await fillPortfolioForm(page);
+    await submit.click();
+    await expect(page.getByRole('button', { name: 'Sending…' })).toBeDisabled();
 
     await expect(form).toBeHidden();
     await expect(thanks).toBeVisible();
     await expect(thanks).toBeFocused();
+    expect(sent).toEqual([
+      {
+        name: 'Test Person',
+        email: 'test@example.com',
+        type: 'AI or workflow automation',
+        note: 'A short note.',
+        website: '',
+        token: 'test-token',
+      },
+    ]);
 
     await page.getByRole('button', { name: 'Send another request' }).click();
     await expect(form).toBeVisible();
@@ -137,11 +184,54 @@ test.describe('home page behaviour', () => {
     await expect(page.getByLabel('Name')).toHaveValue('');
   });
 
+  test('portfolio form shows an error and keeps the details when sending fails', SMOKE, async ({ page }) => {
+    const sent = await fakeFormBackend(page, { status: 502 });
+    await page.goto('/');
+    await fillPortfolioForm(page);
+    await page.getByRole('button', { name: 'Send me examples' }).click();
+
+    const error = page.getByRole('alert');
+    await expect(error).toBeVisible();
+    await expect(error).toContainText("didn't send");
+    await expect(error.getByRole('link', { name: 'hello@hivecrestsystems.com' })).toHaveAttribute(
+      'href',
+      'mailto:hello@hivecrestsystems.com',
+    );
+    await expect(page.locator('#pf-thanks')).toBeHidden();
+    await expect(page.getByLabel('Name')).toHaveValue('Test Person');
+    await expect(page.getByRole('button', { name: 'Send me examples' })).toBeEnabled();
+    expect(sent).toHaveLength(1);
+
+    // Trying again works and gets a fresh Turnstile token.
+    await page.unroute('**/api/portfolio');
+    const retry: Record<string, unknown>[] = [];
+    await page.route('**/api/portfolio', async (route) => {
+      retry.push(route.request().postDataJSON());
+      await route.fulfill({ json: { ok: true } });
+    });
+    await page.getByRole('button', { name: 'Send me examples' }).click();
+    await expect(page.locator('#pf-thanks')).toBeVisible();
+    await expect(error).toBeHidden();
+    expect(retry[0]?.token).toBe('test-token');
+  });
+
   test('portfolio form will not send without a name and email', SMOKE, async ({ page }) => {
+    const sent = await fakeFormBackend(page);
     await page.goto('/');
     await page.getByRole('button', { name: 'Send me examples' }).click();
     await expect(page.locator('#pf-thanks')).toBeHidden();
     await expect(page.locator('#portfolio-form')).toBeVisible();
+    expect(sent).toEqual([]);
+  });
+
+  test('portfolio form spam trap is hidden from people and screen readers', async ({ page }) => {
+    await page.goto('/');
+    const trap = page.locator('#pf-website');
+    await expect(trap).toHaveAttribute('tabindex', '-1');
+    await expect(page.getByRole('textbox', { name: 'Website' })).toHaveCount(0);
+    // The field sits inside a 1px wrapper that clips it out of sight.
+    const box = await page.locator('.form__trap').boundingBox();
+    expect(box && box.width * box.height).toBeLessThanOrEqual(1);
   });
 
   test('hero typing line animates', async ({ page }) => {

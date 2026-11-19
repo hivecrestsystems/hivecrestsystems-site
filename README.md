@@ -27,6 +27,7 @@ The site is built with [Astro](https://astro.build) and deployed to Cloudflare f
 | `npm run test:smoke` | Quick check after small changes (about 25 seconds): build, HTML validation, and the key page, link, accessibility and form tests in Chrome. Docker not needed |
 | `npm test` | Full suite before opening a pull request (about 4 minutes): build, then every check below |
 | `npm run test:html` | Validate the built HTML |
+| `npm run test:worker` | Test the portfolio form endpoint (`worker/`) in Node |
 | `npm run test:browsers` | Accessibility (WCAG 2.1 AA), links, behaviour and screenshot tests in Chromium, Firefox, WebKit and mobile browsers |
 | `npm run test:visual` | Screenshot tests only |
 | `npm run test:visual:update` | Accept intended visual changes as the new baseline screenshots |
@@ -81,6 +82,36 @@ The site is served by two Cloudflare Workers that serve only static files, with 
   - **Signing in:** enter an approved email address, then the one-time code Cloudflare sends to it.
   - **Changing who has access:** in Cloudflare Zero Trust, go to Access controls, then Policies, and edit the email list in the "Hivecrest team" policy.
 - **Email:** hello@hivecrestsystems.com is forwarded to the business inbox by Cloudflare Email Routing. Other addresses at the domain are dropped.
+
+## Portfolio request form
+
+The homepage form posts to `/api/portfolio`, which is the only thing the Worker script handles (`worker/index.ts`). Everything else is served straight from `dist/`. The endpoint (`worker/portfolio.ts`) does the following:
+
+1. Accepts JSON only, from the site's own pages.
+2. Checks every field. The allowed project types are shared with the page through `src/data/portfolio-form.ts`.
+3. Ignores bots that fill in the hidden "website" field, while still answering them as if the request worked.
+4. Verifies the Cloudflare Turnstile token, including its action and hostname.
+5. Emails the request to the business inbox with Reply-To set to the visitor. Nothing is stored. Requests from the dev site have "[dev]" in the subject.
+
+Turnstile loads the first time someone clicks into the form, and it stays invisible unless it needs the visitor to tick a box. Its public site key is in `src/data/portfolio-form.ts`. The widget covers hivecrestsystems.com and its subdomains. Pull request previews on workers.dev aren't covered, so sending the form there shows the error message.
+
+Each Worker needs two secrets, set in the Cloudflare dashboard under the Worker's Settings, then Variables and Secrets. They can only be added once a deploy includes the Worker script.
+
+| Secret | Value |
+|---|---|
+| `FORM_TO` | The business inbox. It must be a verified Email Routing destination. |
+| `TURNSTILE_SECRET_KEY` | The secret key of the "Hivecrest portfolio form" Turnstile widget. |
+
+**Running it locally:**
+1. Create `.dev.vars`. It's git-ignored. Use Turnstile's test keys, which always pass:
+   ```
+   FORM_TO=owner@example.com
+   TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
+   TURNSTILE_EXPECTED_HOSTNAME=example.com
+   ```
+2. Run `PUBLIC_TURNSTILE_SITE_KEY=1x00000000000000000000AA npm run build`, then `npx wrangler dev --env dev`.
+
+Emails aren't sent locally. Wrangler prints them and saves them under `.wrangler/tmp/email/`. `npm run test:worker` tests the endpoint itself, and the browser tests use stand-ins for Turnstile and the endpoint.
 - **Addresses:** pages are served at clean addresses (`/privacy`), and `.html` addresses redirect to them. The local test server does the same.
 
 ## Known issues

@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import FooterBar from '../components/FooterBar.astro';
 import HeroHoneycomb from '../components/HeroHoneycomb.astro';
 import SiteLogo from '../components/SiteLogo.astro';
+import { PROJECT_TYPES, TURNSTILE_ACTION, TURNSTILE_SITE_KEY } from '../data/portfolio-form';
 
 // Phrases typed after "$ hivecrest builds" in the hero.
 const typedPhrases = [
@@ -69,14 +70,8 @@ const benefits = [
   "A short walkthrough call, if you'd like one",
 ];
 
-const projectTypes = [
-  'A new website or redesign',
-  'An online store or Shopify app',
-  'A mobile app or custom software',
-  'AI or workflow automation',
-  'Cloud or IT consulting',
-  'Something else',
-];
+// The project types and Turnstile settings are shared with the Worker that receives the form.
+const projectTypes = PROJECT_TYPES;
 
 const govCodes = [
   { label: 'NAICS', lines: ['541511 Custom computer programming', '541512 Computer systems design', '541519 Other computer services'] },
@@ -175,16 +170,16 @@ const govCodes = [
 </ul>
 </div>
 <div class="form-card">
-{/* TODO: send the form to the form service before showing the thank-you message. */}
-<form id="portfolio-form" class="form">
+{/* Sent by the script below to the Worker at /api/portfolio (worker/portfolio.ts). */}
+<form id="portfolio-form" class="form" action="/api/portfolio" method="post" data-turnstile-sitekey={TURNSTILE_SITE_KEY} data-turnstile-action={TURNSTILE_ACTION}>
 <h3 class="card-title">Request our portfolio</h3>
 <div class="field">
 <label for="pf-name" class="field__label">Name</label>
-<input id="pf-name" name="name" type="text" autocomplete="name" required class="field__control">
+<input id="pf-name" name="name" type="text" autocomplete="name" required maxlength="100" class="field__control">
 </div>
 <div class="field">
 <label for="pf-email" class="field__label">Work email</label>
-<input id="pf-email" name="email" type="email" autocomplete="email" required class="field__control">
+<input id="pf-email" name="email" type="email" autocomplete="email" required maxlength="254" class="field__control">
 </div>
 <div class="field">
 <label for="pf-type" class="field__label">What are you planning?</label>
@@ -194,10 +189,19 @@ const govCodes = [
 </div>
 <div class="field">
 <label for="pf-note" class="field__label">Anything else we should know? (optional)</label>
-<textarea id="pf-note" name="note" rows="3" class="field__control"></textarea>
+<textarea id="pf-note" name="note" rows="3" maxlength="2000" class="field__control"></textarea>
 </div>
+{/* Honeypot: hidden from people and screen readers, so anything typed here came from a bot. */}
+<div class="form__trap" aria-hidden="true">
+<label for="pf-website">Website</label>
+<input id="pf-website" name="website" type="text" tabindex="-1" autocomplete="off">
+</div>
+{/* Cloudflare Turnstile. It stays invisible unless it needs the visitor to tick a box. */}
+<div id="pf-turnstile" class="form__turnstile"></div>
+<p id="pf-error" class="form__error" role="alert" hidden>Sorry, your request didn't send. Please try again, or email us at <a href="mailto:hello@hivecrestsystems.com">hello@hivecrestsystems.com</a>.</p>
 <button type="submit" class="form__submit">Send me examples</button>
 <p class="form__note">We'll only use your details to reply about your project. See our <a href="/privacy">privacy policy</a>.</p>
+<noscript><p class="form__note">This form needs JavaScript. You can also email us at <a href="mailto:hello@hivecrestsystems.com">hello@hivecrestsystems.com</a>.</p></noscript>
 </form>
 <div id="pf-thanks" role="status" tabindex="-1" hidden class="form-thanks">
 <svg viewBox="0 0 100 100" width="48" height="48" aria-hidden="true"><polygon points="50,6 88,28 88,72 50,94 12,72 12,28" fill="#E39A2B"></polygon><polyline points="32,52 45,64 68,40" fill="none" stroke="#18181B" stroke-width="8" stroke-linecap="square"></polyline></svg>
@@ -332,20 +336,106 @@ const govCodes = [
     }, 55);
   }
 
-  // Portfolio request form. Currently only swaps to the thank-you state.
-  // TODO: send the data to the form service before showing the thank-you message.
+  // Portfolio request form: sends the request to the Worker at /api/portfolio, which
+  // checks it and emails it to us. Turnstile (Cloudflare's bot check) loads the first
+  // time someone clicks into the form and stays invisible unless it needs a tick.
+  type Turnstile = {
+    render(container: HTMLElement, options: Record<string, unknown>): string;
+    reset(widgetId: string): void;
+  };
   const form = document.getElementById('portfolio-form') as HTMLFormElement | null;
   const thanks = document.getElementById('pf-thanks');
   const reset = document.getElementById('pf-reset');
-  if (form && thanks) {
-    form.addEventListener('submit', (event) => {
+  const errorBox = document.getElementById('pf-error');
+  const widgetBox = document.getElementById('pf-turnstile');
+  const submitButton = form?.querySelector<HTMLButtonElement>('button[type="submit"]');
+  if (form && thanks && errorBox && widgetBox && submitButton) {
+    const buttonLabel = submitButton.textContent;
+    let widgetId: string | undefined;
+    let token = '';
+    const waiting: ((value: string) => void)[] = [];
+    let turnstileReady: Promise<Turnstile> | undefined;
+
+    const setToken = (value: string) => {
+      token = value;
+      if (value) waiting.splice(0).forEach((resolve) => resolve(value));
+    };
+
+    const loadTurnstile = () =>
+      (turnstileReady ??= new Promise<Turnstile>((resolve, reject) => {
+        const w = window as unknown as Record<string, unknown>;
+        w.onHivecrestTurnstile = () => resolve(w.turnstile as Turnstile);
+        const script = document.createElement('script');
+        script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onHivecrestTurnstile';
+        script.async = true;
+        script.onerror = () => reject(new Error('Turnstile did not load'));
+        document.head.append(script);
+      }).then((turnstile) => {
+        widgetId = turnstile.render(widgetBox, {
+          sitekey: form.dataset.turnstileSitekey,
+          action: form.dataset.turnstileAction,
+          appearance: 'interaction-only',
+          callback: setToken,
+          'expired-callback': () => setToken(''),
+          'error-callback': () => setToken(''),
+        });
+        return turnstile;
+      }));
+
+    // Waits for Turnstile's token; gives up after 30 seconds.
+    const getToken = () =>
+      token
+        ? Promise.resolve(token)
+        : new Promise<string>((resolve, reject) => {
+            waiting.push(resolve);
+            setTimeout(() => reject(new Error('Turnstile timed out')), 30_000);
+          });
+
+    form.addEventListener('focusin', () => loadTurnstile().catch(() => {}), { once: true });
+
+    form.addEventListener('submit', async (event) => {
       event.preventDefault();
-      form.hidden = true;
-      thanks.hidden = false;
-      thanks.focus();
+      errorBox.hidden = true;
+      submitButton.disabled = true;
+      submitButton.textContent = 'Sending…';
+      form.setAttribute('aria-busy', 'true');
+      let turnstile: Turnstile | undefined;
+      try {
+        turnstile = await loadTurnstile();
+        const data = new FormData(form);
+        const response = await fetch(form.action, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({
+            name: data.get('name'),
+            email: data.get('email'),
+            type: data.get('type'),
+            note: data.get('note'),
+            website: data.get('website'),
+            token: await getToken(),
+          }),
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        form.hidden = true;
+        thanks.hidden = false;
+        thanks.focus();
+      } catch {
+        errorBox.hidden = false;
+      } finally {
+        // Turnstile tokens work once, so get a fresh one for any next attempt.
+        if (turnstile && widgetId) {
+          setToken('');
+          turnstile.reset(widgetId);
+        }
+        submitButton.disabled = false;
+        submitButton.textContent = buttonLabel;
+        form.removeAttribute('aria-busy');
+      }
     });
+
     reset?.addEventListener('click', () => {
       form.reset();
+      errorBox.hidden = true;
       thanks.hidden = true;
       form.hidden = false;
     });

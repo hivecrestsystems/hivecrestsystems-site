@@ -11,8 +11,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "test": "npm run build && npm run test:html && npm run test:browsers && npm run test:lighthouse",
-    "test:smoke": "astro build && html-validate \"dist/**/*.html\" && SMOKE=1 playwright test",
+    "test": "npm run build && npm run test:html && npm run test:worker && npm run test:browsers && npm run test:lighthouse",
+    "test:smoke": "astro build && html-validate \"dist/**/*.html\" && npm run test:worker && SMOKE=1 playwright test",
     "test:html": "html-validate \"dist/**/*.html\"",
     "test:browsers": "node scripts/run-playwright.mjs",
     "test:visual": "node scripts/run-playwright.mjs --project=visual",
@@ -20,7 +20,8 @@
     "test:lighthouse": "lhci autorun",
     "test:report": "playwright show-report",
     "branches:prune": "bash scripts/prune-branches.sh",
-    "release:tag": "bash scripts/tag-release.sh"
+    "release:tag": "bash scripts/tag-release.sh",
+    "test:worker": "node --test \"worker/**/*.test.ts\""
   },
   "dependencies": {
     "astro": "7.4.13"
