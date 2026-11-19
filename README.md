@@ -77,7 +77,10 @@ The site is served by two Cloudflare Workers that serve only static files, with 
 | `hivecrest-site-dev` | `dev` | `npx wrangler deploy --env dev` | dev.hivecrestsystems.com |
 
 - **Pull request previews:** pull request branches build a preview on `hivecrest-site-dev` with `npx wrangler preview --env dev`. Cloudflare posts the preview link on the pull request.
-- **Access:** dev.hivecrestsystems.com and the preview links sit behind Cloudflare Access. Only approved email addresses can sign in.
+- **Access:** dev.hivecrestsystems.com and the preview links sit behind Cloudflare Access, through the `hivecrestsystems.cloudflareaccess.com` sign-in page.
+  - **Signing in:** enter an approved email address, then the one-time code Cloudflare sends to it.
+  - **Changing who has access:** in Cloudflare Zero Trust, go to Access controls, then Policies, and edit the email list in the "Hivecrest team" policy.
+- **Email:** hello@hivecrestsystems.com is forwarded to the business inbox by Cloudflare Email Routing. Other addresses at the domain are dropped.
 - **Addresses:** pages are served at clean addresses (`/privacy`), and `.html` addresses redirect to them. The local test server does the same.
 
 ## Known issues
