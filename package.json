@@ -12,6 +12,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "test": "npm run build && npm run test:html && npm run test:browsers && npm run test:lighthouse",
+    "test:smoke": "astro build && html-validate \"dist/**/*.html\" && SMOKE=1 playwright test",
     "test:html": "html-validate \"dist/**/*.html\"",
     "test:browsers": "node scripts/run-playwright.mjs",
     "test:visual": "node scripts/run-playwright.mjs --project=visual",

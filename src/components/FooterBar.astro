@@ -1,0 +1,22 @@
+---
+// Copyright line and legal links shared by every page footer.
+import CrestIcon from './CrestIcon.astro';
+
+interface Props {
+  /** "ruled" sits under the homepage contact block; "compact" is a footer on its own. */
+  variant: 'ruled' | 'compact';
+  /** Which legal page is open, if any. */
+  current?: 'privacy';
+}
+const { variant, current } = Astro.props;
+---
+<div class:list={['footer-bar', `footer-bar--${variant}`, { container: variant === 'compact' }]}>
+<div class="footer-bar__brand">
+<CrestIcon size={28} />
+<span>© 2026 Hivecrest Systems LLC · Maryland, USA</span>
+</div>
+<nav aria-label="Legal" class="legal-nav">
+<a href="privacy.html" aria-current={current === 'privacy' ? 'page' : undefined}>Privacy</a>
+<a href="#top">Accessibility</a>
+</nav>
+</div>

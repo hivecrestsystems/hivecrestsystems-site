@@ -1,0 +1,13 @@
+---
+// The crest-cell icon for dark backgrounds, drawn inline so it needs no extra request.
+interface Props {
+  size: number;
+}
+const { size } = Astro.props;
+---
+<svg viewBox="0 0 100 100" width={size} height={size} aria-hidden="true">
+<polygon points="50,21.5 64.29,29.75 64.29,46.25 50,54.5 35.71,46.25 35.71,29.75" fill="#E39A2B"></polygon>
+<polyline points="42.5,43 50,35.5 57.5,43" fill="none" stroke="#141416" stroke-width="3.6" stroke-linecap="square"></polyline>
+<polygon points="34.41,48.5 48.7,56.75 48.7,73.25 34.41,81.5 20.12,73.25 20.12,56.75" fill="#EDEBE4"></polygon>
+<polygon points="65.59,48.5 79.88,56.75 79.88,73.25 65.59,81.5 51.3,73.25 51.3,56.75" fill="#EDEBE4"></polygon>
+</svg>

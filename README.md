@@ -13,8 +13,8 @@ The site is built with [Astro](https://astro.build) and deployed to Cloudflare f
 ## Requirements
 
 - Node.js 22.23.4 or newer (see `.node-version`)
-- Docker Desktop, running, for the browser tests
-- Google Chrome, for the Lighthouse checks
+- Docker Desktop, running, for the full browser tests
+- Google Chrome, for the smoke tests and the Lighthouse checks
 
 ## Commands
 
@@ -24,7 +24,8 @@ The site is built with [Astro](https://astro.build) and deployed to Cloudflare f
 | `npm run dev` | Start a local dev server at http://localhost:4321 with live reload |
 | `npm run build` | Build the site into `dist/` |
 | `npm run preview` | Serve the built `dist/` locally, the way it will be deployed |
-| `npm test` | Build, then run every check below |
+| `npm run test:smoke` | Quick check after small changes (about 25 seconds): build, HTML validation, and the key page, link, accessibility and form tests in Chrome. Docker not needed |
+| `npm test` | Full suite before opening a pull request (about 4 minutes): build, then every check below |
 | `npm run test:html` | Validate the built HTML |
 | `npm run test:browsers` | Accessibility (WCAG 2.1 AA), links, behaviour and screenshot tests in Chromium, Firefox, WebKit and mobile browsers |
 | `npm run test:visual` | Screenshot tests only |
@@ -40,11 +41,13 @@ Browser tests run inside the official Playwright container, so screenshots look 
 
 ```
 src/
-  layouts/BaseLayout.astro   Shared <head>: title, description, social preview, icons, fonts
+  layouts/BaseLayout.astro   Shared <head>: title, description, social preview, icons, font preloads
   pages/index.astro          Homepage
   pages/privacy.astro        Privacy policy
+  components/                Site logo, crest icon, hero honeycomb, footer bar
+  styles/site.css            All site styles, built on the brand tokens
 public/assets/               Favicons, social preview image, logos (copied to the site as-is)
-brand/                       Brand guide, design tokens, logo files and fonts
+brand/                       Brand guide, design tokens, logo files and fonts (the site's fonts are served from here)
 tests/                       Browser tests and baseline screenshots
 scripts/                     Test runner, branch pruning and release tagging
 ```
@@ -54,7 +57,7 @@ Read `brand/BRAND.md` before making any visual change.
 ## How changes ship
 
 1. Create an iteration branch from `dev`, named `iter/NN-short-name` (for example `iter/02-stylesheet`).
-2. Make the change and run `npm test` until everything passes.
+2. Make the change. Run `npm run test:smoke` after each small change, and `npm test` (the full suite) before opening the pull request.
 3. Open a pull request into `dev`. The checks run automatically, and Cloudflare posts a preview link.
 4. After review and approval, merge into `dev`, then check the change on dev.hivecrestsystems.com.
 5. Open a release pull request from `dev` into `main`. After review and approval, merge it to publish to hivecrestsystems.com.
@@ -65,10 +68,7 @@ Read `brand/BRAND.md` before making any visual change.
 
 ## Known issues
 
-Tracked as expected failures in the tests. Each one starts failing as a reminder once it's fixed.
-
-- The homepage has no `<main>` landmark, which caps its Lighthouse accessibility score at 98.
-- At 320px wide, the homepage's service cards and email button overflow sideways by 12–20px.
+None open. When a problem can't be fixed straight away, add a test marked with `test.fail(...)` and a note here; the test starts failing as a reminder once the problem is fixed.
 
 ---
 

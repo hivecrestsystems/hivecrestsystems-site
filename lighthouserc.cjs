@@ -12,23 +12,9 @@ module.exports = {
           matchingUrlPattern: '.*',
           assertions: {
             'categories:performance': ['error', { minScore: 0.9, aggregationMethod: 'median-run' }],
+            'categories:accessibility': ['error', { minScore: 1 }],
             'categories:best-practices': ['error', { minScore: 0.95 }],
             'categories:seo': ['error', { minScore: 0.95 }],
-          },
-        },
-        {
-          // Every page except the homepage must score 100 for accessibility.
-          matchingUrlPattern: '^(?!.*/index\\.html$).*$',
-          assertions: {
-            'categories:accessibility': ['error', { minScore: 1 }],
-          },
-        },
-        {
-          // KNOWN ISSUE (iteration 1): the homepage has no <main> landmark, which
-          // caps it at 98. Iteration 2 adds <main>; raise this to 1 then.
-          matchingUrlPattern: '/index\\.html$',
-          assertions: {
-            'categories:accessibility': ['error', { minScore: 0.98 }],
           },
         },
       ],

@@ -1,0 +1,55 @@
+---
+// Decorative honeycomb behind the homepage hero. The honey-outlined cell is the "crest".
+// Two drawings: a cluster for tablets and desktops, and a strip along the bottom of
+// the hero for phones. site.css shows one or the other.
+
+// Phone strip: rows of pointy-top cells, each about 45px wide so it can be tapped.
+const R = 28; // cell radius in px
+const ROWS = 3;
+const COLS = 15; // wide enough for any phone; the header crops the rest
+const HONEY = { row: 1, col: 12 }; // about 120px in from the right edge
+const COL_STEP = Math.sqrt(3) * R;
+const ROW_STEP = 1.5 * R;
+const stripWidth = +(COLS * COL_STEP + COL_STEP / 2).toFixed(1);
+const stripHeight = ROW_STEP * (ROWS - 1) + 2 * R;
+
+function hexPoints(cx: number, cy: number) {
+  return Array.from({ length: 6 }, (_, i) => {
+    const angle = ((60 * i - 90) * Math.PI) / 180;
+    return `${(cx + 0.92 * R * Math.cos(angle)).toFixed(1)},${(cy + 0.92 * R * Math.sin(angle)).toFixed(1)}`;
+  }).join(' ');
+}
+
+const stripCells = [];
+let honeyPoints = '';
+for (let row = 0; row < ROWS; row++) {
+  for (let col = 0; col < COLS; col++) {
+    const points = hexPoints((col + 0.5) * COL_STEP + (row % 2 ? COL_STEP / 2 : 0), R + row * ROW_STEP);
+    if (row === HONEY.row && col === HONEY.col) honeyPoints = points;
+    // The top row is fainter, so the strip fades upward into the hero.
+    else stripCells.push({ points, opacity: [0.5, 0.8, 1][row] });
+  }
+}
+---
+<svg class="hero-honeycomb" viewBox="0 0 100 100" aria-hidden="true">
+<polygon points="40.00,10.80 47.97,15.40 47.97,24.60 40.00,29.20 32.03,24.60 32.03,15.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
+<polygon points="57.32,10.80 65.29,15.40 65.29,24.60 57.32,29.20 49.35,24.60 49.35,15.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
+<polygon points="74.64,10.80 82.61,15.40 82.61,24.60 74.64,29.20 66.67,24.60 66.67,15.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
+<polygon points="31.34,25.80 39.31,30.40 39.31,39.60 31.34,44.20 23.37,39.60 23.37,30.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
+<polygon points="48.66,25.80 56.63,30.40 56.63,39.60 48.66,44.20 40.69,39.60 40.69,30.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
+<polygon points="83.30,25.80 91.27,30.40 91.27,39.60 83.30,44.20 75.33,39.60 75.33,30.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
+<polygon points="40.00,40.80 47.97,45.40 47.97,54.60 40.00,59.20 32.03,54.60 32.03,45.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
+<polygon points="57.32,40.80 65.29,45.40 65.29,54.60 57.32,59.20 49.35,54.60 49.35,45.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
+<polygon points="74.64,40.80 82.61,45.40 82.61,54.60 74.64,59.20 66.67,54.60 66.67,45.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
+<polygon points="91.96,40.80 99.93,45.40 99.93,54.60 91.96,59.20 83.99,54.60 83.99,45.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
+<polygon points="48.66,55.80 56.63,60.40 56.63,69.60 48.66,74.20 40.69,69.60 40.69,60.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
+<polygon points="65.98,55.80 73.95,60.40 73.95,69.60 65.98,74.20 58.01,69.60 58.01,60.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
+<polygon points="83.30,55.80 91.27,60.40 91.27,69.60 83.30,74.20 75.33,69.60 75.33,60.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
+<polygon points="57.32,70.80 65.29,75.40 65.29,84.60 57.32,89.20 49.35,84.60 49.35,75.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
+<polygon points="74.64,70.80 82.61,75.40 82.61,84.60 74.64,89.20 66.67,84.60 66.67,75.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
+<polygon points="65.98,25.80 73.95,30.40 73.95,39.60 65.98,44.20 58.01,39.60 58.01,30.40" fill="none" stroke="#E39A2B" stroke-width="0.6"></polygon>
+</svg>
+<svg class="hero-strip" width={stripWidth} height={stripHeight} viewBox={`0 0 ${stripWidth} ${stripHeight}`} aria-hidden="true">
+{stripCells.map((c) => <polygon points={c.points} fill="none" stroke="#34343A" stroke-width="1.5" opacity={c.opacity}></polygon>)}
+<polygon points={honeyPoints} fill="none" stroke="#E39A2B" stroke-width="2"></polygon>
+</svg>
