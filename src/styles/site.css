@@ -6,6 +6,10 @@
 :root {
   --hc-field-border: #CFCCC2;
   --hc-divider-dark: #2E2E33;
+  /* Form error message (text on background contrast is about 8:1). */
+  --hc-error-text: #7A2E1F;
+  --hc-error-bg: #FBEFEC;
+  --hc-error-border: #E8B4A8;
   --hc-gutter: 32px;
 }
 
@@ -535,6 +539,29 @@ textarea.field__control { resize: vertical; }
   color: var(--hc-stone);
 }
 .form__note a { color: var(--hc-stone); }
+/* Honeypot field: off-screen and hidden from assistive technology (see index.astro). */
+.form__trap {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+/* Turnstile only takes space when it shows a check to the visitor. */
+.form__turnstile:empty { display: none; }
+.form__error {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--hc-error-border);
+  border-radius: var(--hc-radius-sm);
+  background: var(--hc-error-bg);
+  color: var(--hc-error-text);
+  font-size: 15px;
+  line-height: 1.5;
+}
+.form__error a { color: inherit; }
+.form__submit:disabled { cursor: progress; opacity: 0.7; }
 .form-thanks {
   display: flex;
   flex-direction: column;
