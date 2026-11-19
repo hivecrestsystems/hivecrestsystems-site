@@ -1,320 +1,354 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import FooterBar from '../components/FooterBar.astro';
+import HeroHoneycomb from '../components/HeroHoneycomb.astro';
+import SiteLogo from '../components/SiteLogo.astro';
+
+// Phrases typed after "$ hivecrest builds" in the hero.
+const typedPhrases = [
+  'websites that sell.',
+  'apps people actually use.',
+  'automations that give you hours back.',
+  'cloud that grows with you.',
+  'IT that just works.',
+];
+// The line is monospaced, so the phrase with the most characters is the widest.
+const longestPhrase = typedPhrases.reduce((a, b) => (b.length > a.length ? b : a));
+
+// Main links. The numbers match the section eyebrows and show in the phone menu.
+const navLinks = [
+  { href: '#services', label: 'Services', num: '01' },
+  { href: '#work', label: 'Work', num: '03' },
+  { href: '#government', label: 'Government', num: '04' },
+  { href: '#about', label: 'About', num: '05' },
+];
+
+const services = [
+  {
+    title: 'Websites & web apps',
+    text: 'Fast, accessible websites and web applications that are easy to find and easy to update.',
+    tags: 'Redesigns · Accessibility · SEO',
+  },
+  {
+    title: 'E-commerce & Shopify',
+    text: 'Shopify stores, theme customization and custom Shopify apps that make selling simpler.',
+    tags: 'Store builds · Custom apps · Integrations',
+  },
+  {
+    title: 'Mobile & custom software',
+    text: 'iOS and Android apps from one codebase, plus internal tools and dashboards for your team.',
+    tags: 'React Native · Internal tools · APIs',
+  },
+  {
+    title: 'AI & automation',
+    text: 'Assistants and automated workflows that answer questions, book appointments and follow up for you.',
+    tags: 'Chat assistants · Workflows · Integrations',
+  },
+  {
+    title: 'Cloud & IT consulting',
+    text: 'Cloud setup, migrations and practical technical guidance for growing teams.',
+    tags: 'AWS · Azure · Microsoft 365 · Google Workspace',
+  },
+  {
+    title: 'Care & support plans',
+    text: 'Hosting, updates, monitoring and fixes on a predictable monthly plan.',
+    tags: 'Hosting · Monitoring · Maintenance',
+  },
+];
+
+const steps = [
+  { title: 'Discover', text: "We learn how your business runs and what's slowing it down." },
+  { title: 'Design', text: 'We plan and prototype before writing code, while changes are still cheap.' },
+  { title: 'Build', text: 'We ship in short cycles you can review and test as we go.' },
+  { title: 'Run', text: "We host, monitor and keep improving what we've built together." },
+];
+
+const benefits = [
+  'Examples matched to your project type',
+  'How each one was scoped, built and launched',
+  "A short walkthrough call, if you'd like one",
+];
+
+const projectTypes = [
+  'A new website or redesign',
+  'An online store or Shopify app',
+  'A mobile app or custom software',
+  'AI or workflow automation',
+  'Cloud or IT consulting',
+  'Something else',
+];
+
+const govCodes = [
+  { label: 'NAICS', lines: ['541511 Custom computer programming', '541512 Computer systems design', '541519 Other computer services'] },
+  { label: 'PSC', lines: ['DA01 Application development'] },
+  { label: 'UEI', lines: ['[PENDING SAM.GOV]'] },
+  { label: 'CAGE', lines: ['[PENDING]'] },
+];
 ---
 <BaseLayout
   title="Hivecrest Systems | Software, web, cloud and IT consulting"
   description="Hivecrest Systems designs, builds and supports the websites, software, cloud and automation that businesses and public agencies run on."
   path="/"
 >
-<Fragment slot="head">
-<style is:inline>
-body{margin:0}
-a{color:#18181B}a:hover{color:#5F5E5A}
-@keyframes hc-blink{50%{opacity:0}}
-.hc-cursor{animation:hc-blink 1s step-end infinite}
-@media (prefers-reduced-motion: reduce){.hc-cursor{animation:none}}
-[hidden]{display:none !important}
-</style>
-</Fragment>
-<div style="background: #F6F5F1; color: #18181B; font-family: Inter, system-ui, sans-serif">
+<header class="site-header">
+<HeroHoneycomb />
 
-<header style="background: #141416; color: #EDEBE4; position: relative; overflow: hidden">
-<svg viewBox="0 0 100 100" aria-hidden="true" style="position: absolute; right: -80px; top: 60px; width: 620px; height: 620px; pointer-events: none">
-<polygon points="40.00,10.80 47.97,15.40 47.97,24.60 40.00,29.20 32.03,24.60 32.03,15.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="57.32,10.80 65.29,15.40 65.29,24.60 57.32,29.20 49.35,24.60 49.35,15.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="74.64,10.80 82.61,15.40 82.61,24.60 74.64,29.20 66.67,24.60 66.67,15.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="31.34,25.80 39.31,30.40 39.31,39.60 31.34,44.20 23.37,39.60 23.37,30.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="48.66,25.80 56.63,30.40 56.63,39.60 48.66,44.20 40.69,39.60 40.69,30.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="83.30,25.80 91.27,30.40 91.27,39.60 83.30,44.20 75.33,39.60 75.33,30.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="40.00,40.80 47.97,45.40 47.97,54.60 40.00,59.20 32.03,54.60 32.03,45.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="57.32,40.80 65.29,45.40 65.29,54.60 57.32,59.20 49.35,54.60 49.35,45.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="74.64,40.80 82.61,45.40 82.61,54.60 74.64,59.20 66.67,54.60 66.67,45.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="91.96,40.80 99.93,45.40 99.93,54.60 91.96,59.20 83.99,54.60 83.99,45.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="48.66,55.80 56.63,60.40 56.63,69.60 48.66,74.20 40.69,69.60 40.69,60.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="65.98,55.80 73.95,60.40 73.95,69.60 65.98,74.20 58.01,69.60 58.01,60.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="83.30,55.80 91.27,60.40 91.27,69.60 83.30,74.20 75.33,69.60 75.33,60.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="57.32,70.80 65.29,75.40 65.29,84.60 57.32,89.20 49.35,84.60 49.35,75.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="74.64,70.80 82.61,75.40 82.61,84.60 74.64,89.20 66.67,84.60 66.67,75.40" fill="none" stroke="#34343A" stroke-width="0.35"></polygon>
-<polygon points="65.98,25.80 73.95,30.40 73.95,39.60 65.98,44.20 58.01,39.60 58.01,30.40" fill="none" stroke="#E39A2B" stroke-width="0.6"></polygon>
-</svg>
-
-<div style="max-width: 1200px; margin: 0 auto; padding: 20px 32px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; position: relative">
-<a href="#top" aria-label="Hivecrest Systems home" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #EDEBE4">
-<svg viewBox="0 0 100 100" width="40" height="40" aria-hidden="true">
-<polygon points="50,21.5 64.29,29.75 64.29,46.25 50,54.5 35.71,46.25 35.71,29.75" fill="#E39A2B"></polygon>
-<polyline points="42.5,43 50,35.5 57.5,43" fill="none" stroke="#141416" stroke-width="3.6" stroke-linecap="square"></polyline>
-<polygon points="34.41,48.5 48.7,56.75 48.7,73.25 34.41,81.5 20.12,73.25 20.12,56.75" fill="#EDEBE4"></polygon>
-<polygon points="65.59,48.5 79.88,56.75 79.88,73.25 65.59,81.5 51.3,73.25 51.3,56.75" fill="#EDEBE4"></polygon>
-</svg>
-<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 800; font-size: 22px; letter-spacing: -0.5px">hivecrest</span>
-</a>
-<nav aria-label="Main" style="display: flex; flex-wrap: wrap; align-items: center; gap: 28px; font-size: 15px; font-weight: 500">
-<a href="#services" style="color: #EDEBE4; text-decoration: none">Services</a>
-<a href="#work" style="color: #EDEBE4; text-decoration: none">Work</a>
-<a href="#government" style="color: #EDEBE4; text-decoration: none">Government</a>
-<a href="#about" style="color: #EDEBE4; text-decoration: none">About</a>
-<a href="#contact" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 8px; background: #E39A2B; color: #18181B; font-weight: 600; text-decoration: none">Book a call</a>
+<div class="container topbar topbar--menu">
+<SiteLogo href="#top" />
+<button type="button" id="menu-toggle" class="menu-toggle" aria-expanded="false" aria-controls="main-nav">
+<svg class="menu-toggle__icon menu-toggle__icon--open" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg>
+<svg class="menu-toggle__icon menu-toggle__icon--close" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg>
+<span class="menu-toggle__label">Menu</span>
+</button>
+<nav id="main-nav" aria-label="Main" class="main-nav">
+{navLinks.map((l) => (
+<a href={l.href} class="main-nav__link">{l.label}<span class="main-nav__num" aria-hidden="true">{l.num}</span></a>
+))}
+<a href="#contact" class="btn btn--sm btn--honey main-nav__cta"><svg class="main-nav__cta-icon" viewBox="0 0 100 100" width="18" height="18" aria-hidden="true"><polygon points="50,6 88,28 88,72 50,94 12,72 12,28" fill="#18181B"></polygon></svg>Book a call</a>
 </nav>
 </div>
 
-<section id="top" style="position: relative">
-<div style="max-width: 1200px; margin: 0 auto; padding: 88px 32px 128px; display: flex; flex-direction: column; gap: 28px">
-<p style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px; font-weight: 500; letter-spacing: 2px; color: #E39A2B">IT SERVICES · IT CONSULTING</p>
-<h1 style="margin: 0; max-width: 900px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 800; font-size: clamp(40px, 5.4vw, 76px); line-height: 1.05; letter-spacing: -2px">Strong systems, built cell by cell.</h1>
-<p aria-hidden="true" style="margin: 0; min-height: 1.5em; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: clamp(17px, 2vw, 24px); font-weight: 500; color: #EDEBE4"><span style="color: #E39A2B">$</span> hivecrest build <span id="typed" style="color: #E39A2B">websites that sell.</span><span class="hc-cursor" style="display: inline-block; width: 0.55em; height: 1.05em; margin-left: 2px; vertical-align: -0.15em; background: #E39A2B"></span></p>
-<p style="margin: 0; max-width: 640px; font-size: 20px; line-height: 1.6; color: #C9C7BF">Hivecrest Systems designs, builds and supports the websites, software, cloud and automation that businesses and public agencies run on.</p>
-<div style="display: flex; flex-wrap: wrap; gap: 16px; margin-top: 8px">
-<a href="#contact" style="display: inline-flex; align-items: center; min-height: 52px; padding: 0 24px; border-radius: 8px; background: #E39A2B; color: #18181B; font-size: 16px; font-weight: 600; text-decoration: none">Book a free consultation</a>
-<a href="#services" style="display: inline-flex; align-items: center; min-height: 52px; padding: 0 24px; border-radius: 8px; border: 1px solid #5F5E5A; color: #EDEBE4; font-size: 16px; font-weight: 600; text-decoration: none">See what we build</a>
+<section id="top" class="hero">
+<div class="container hero__inner">
+<p class="eyebrow eyebrow--honey">IT SERVICES · IT CONSULTING</p>
+<h1 class="hero__title"><span class="hero__title-line">Strong systems,</span> <span class="hero__title-line">built cell by cell.</span></h1>
+<p aria-hidden="true" class="hero__terminal">
+<span class="hero__terminal-line hero__terminal-sizer"><span class="hero__prompt">$</span> hivecrest builds <span class="hero__typed">{longestPhrase}</span><span class="hc-cursor"></span></span>
+<span class="hero__terminal-line"><span class="hero__prompt">$</span> hivecrest builds <span id="typed" class="hero__typed" data-phrases={JSON.stringify(typedPhrases)}>{typedPhrases[0]}</span><span class="hc-cursor"></span></span>
+</p>
+<p class="hero__lede">Hivecrest Systems designs, builds and supports the websites, software, cloud and automation that businesses and public agencies run on.</p>
+<div class="button-row">
+<a href="#contact" class="btn btn--honey">Book a free consultation</a>
+<a href="#services" class="btn btn--ghost-dark">See what we build</a>
 </div>
 </div>
 </section>
 </header>
 
-<section id="services" style="max-width: 1200px; margin: 0 auto; padding: 112px 32px; display: flex; flex-direction: column; gap: 48px">
-<div style="display: flex; flex-direction: column; gap: 16px">
-<p style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px; font-weight: 500; letter-spacing: 2px; color: #5F5E5A">01 / SERVICES</p>
-<h2 style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 800; font-size: clamp(30px, 3.4vw, 46px); letter-spacing: -1px; line-height: 1.1">What we build and run</h2>
-<p style="margin: 0; max-width: 640px; font-size: 18px; line-height: 1.6; color: #5F5E5A">From a first website to a full system, every piece is built to fit with the rest.</p>
+<main id="main">
+<section id="services" class="container services">
+<div class="section-head">
+<p class="eyebrow">01 / SERVICES</p>
+<h2 class="section-title">What we build and run</h2>
+<p class="section-intro">From a first website to a full system, every piece is built to fit with the rest.</p>
 </div>
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px">
-
-<article style="background: #FFFFFF; border: 1px solid #E2E0D8; border-radius: 12px; padding: 28px; display: flex; flex-direction: column; gap: 14px">
+<div class="service-grid">
+{services.map((s) => (
+<article class="service-card">
 <svg viewBox="0 0 100 100" width="36" height="36" aria-hidden="true"><polygon points="50,6 88,28 88,72 50,94 12,72 12,28" fill="#E39A2B"></polygon><polyline points="34,62 50,46 66,62" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="square"></polyline></svg>
-<h3 style="margin: 0; font-size: 20px; font-weight: 600">Websites &amp; web apps</h3>
-<p style="margin: 0; font-size: 16px; line-height: 1.6; color: #5F5E5A">Fast, accessible websites and web applications that are easy to find and easy to update.</p>
-<p style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; font-weight: 500; color: #3A3A3F">Redesigns · Accessibility · SEO</p>
+<h3 class="item-title">{s.title}</h3>
+<p class="service-card__text">{s.text}</p>
+<p class="service-card__tags">{s.tags}</p>
 </article>
-
-<article style="background: #FFFFFF; border: 1px solid #E2E0D8; border-radius: 12px; padding: 28px; display: flex; flex-direction: column; gap: 14px">
-<svg viewBox="0 0 100 100" width="36" height="36" aria-hidden="true"><polygon points="50,6 88,28 88,72 50,94 12,72 12,28" fill="#E39A2B"></polygon><polyline points="34,62 50,46 66,62" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="square"></polyline></svg>
-<h3 style="margin: 0; font-size: 20px; font-weight: 600">E-commerce &amp; Shopify</h3>
-<p style="margin: 0; font-size: 16px; line-height: 1.6; color: #5F5E5A">Shopify stores, theme customization and custom Shopify apps that make selling simpler.</p>
-<p style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; font-weight: 500; color: #3A3A3F">Store builds · Custom apps · Integrations</p>
-</article>
-
-<article style="background: #FFFFFF; border: 1px solid #E2E0D8; border-radius: 12px; padding: 28px; display: flex; flex-direction: column; gap: 14px">
-<svg viewBox="0 0 100 100" width="36" height="36" aria-hidden="true"><polygon points="50,6 88,28 88,72 50,94 12,72 12,28" fill="#E39A2B"></polygon><polyline points="34,62 50,46 66,62" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="square"></polyline></svg>
-<h3 style="margin: 0; font-size: 20px; font-weight: 600">Mobile &amp; custom software</h3>
-<p style="margin: 0; font-size: 16px; line-height: 1.6; color: #5F5E5A">iOS and Android apps from one codebase, plus internal tools and dashboards for your team.</p>
-<p style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; font-weight: 500; color: #3A3A3F">React Native · Internal tools · APIs</p>
-</article>
-
-<article style="background: #FFFFFF; border: 1px solid #E2E0D8; border-radius: 12px; padding: 28px; display: flex; flex-direction: column; gap: 14px">
-<svg viewBox="0 0 100 100" width="36" height="36" aria-hidden="true"><polygon points="50,6 88,28 88,72 50,94 12,72 12,28" fill="#E39A2B"></polygon><polyline points="34,62 50,46 66,62" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="square"></polyline></svg>
-<h3 style="margin: 0; font-size: 20px; font-weight: 600">AI &amp; automation</h3>
-<p style="margin: 0; font-size: 16px; line-height: 1.6; color: #5F5E5A">Assistants and automated workflows that answer questions, book appointments and follow up for you.</p>
-<p style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; font-weight: 500; color: #3A3A3F">Chat assistants · Workflows · Integrations</p>
-</article>
-
-<article style="background: #FFFFFF; border: 1px solid #E2E0D8; border-radius: 12px; padding: 28px; display: flex; flex-direction: column; gap: 14px">
-<svg viewBox="0 0 100 100" width="36" height="36" aria-hidden="true"><polygon points="50,6 88,28 88,72 50,94 12,72 12,28" fill="#E39A2B"></polygon><polyline points="34,62 50,46 66,62" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="square"></polyline></svg>
-<h3 style="margin: 0; font-size: 20px; font-weight: 600">Cloud &amp; IT consulting</h3>
-<p style="margin: 0; font-size: 16px; line-height: 1.6; color: #5F5E5A">Cloud setup, migrations and practical technical guidance for growing teams.</p>
-<p style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; font-weight: 500; color: #3A3A3F">AWS · Azure · Microsoft 365 · Google Workspace</p>
-</article>
-
-<article style="background: #FFFFFF; border: 1px solid #E2E0D8; border-radius: 12px; padding: 28px; display: flex; flex-direction: column; gap: 14px">
-<svg viewBox="0 0 100 100" width="36" height="36" aria-hidden="true"><polygon points="50,6 88,28 88,72 50,94 12,72 12,28" fill="#E39A2B"></polygon><polyline points="34,62 50,46 66,62" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="square"></polyline></svg>
-<h3 style="margin: 0; font-size: 20px; font-weight: 600">Care &amp; support plans</h3>
-<p style="margin: 0; font-size: 16px; line-height: 1.6; color: #5F5E5A">Hosting, updates, monitoring and fixes on a predictable monthly plan.</p>
-<p style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; font-weight: 500; color: #3A3A3F">Hosting · Monitoring · Maintenance</p>
-</article>
-
+))}
 </div>
 </section>
 
-<section style="background: #18181B; color: #EDEBE4">
-<div style="max-width: 1200px; margin: 0 auto; padding: 104px 32px; display: flex; flex-direction: column; gap: 48px">
-<div style="display: flex; flex-direction: column; gap: 16px">
-<p style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px; font-weight: 500; letter-spacing: 2px; color: #E39A2B">02 / HOW WE WORK</p>
-<h2 style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 800; font-size: clamp(30px, 3.4vw, 46px); letter-spacing: -1px; line-height: 1.1">Small cells. Strong structure.</h2>
-<p style="margin: 0; max-width: 640px; font-size: 18px; line-height: 1.6; color: #C9C7BF">We work in short, visible steps, so you always know what's built, what's next and what it costs.</p>
+<section class="section-dark">
+<div class="container process">
+<div class="section-head">
+<p class="eyebrow eyebrow--honey">02 / HOW WE WORK</p>
+<h2 class="section-title">Small cells. Strong structure.</h2>
+<p class="section-intro section-intro--on-dark">We work in short, visible steps, so you always know what's built, what's next and what it costs.</p>
 </div>
-<ol style="margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 32px">
-<li style="display: flex; flex-direction: column; gap: 10px; border-top: 1px solid #3A3A3F; padding-top: 20px">
-<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 15px; font-weight: 800; color: #E39A2B">01</span>
-<h3 style="margin: 0; font-size: 20px; font-weight: 600">Discover</h3>
-<p style="margin: 0; font-size: 16px; line-height: 1.6; color: #C9C7BF">We learn how your business runs and what's slowing it down.</p>
+<ol class="process-list">
+{steps.map((step, i) => (
+<li class="process-step">
+<span class="process-step__num">{String(i + 1).padStart(2, '0')}</span>
+<h3 class="item-title">{step.title}</h3>
+<p class="process-step__text">{step.text}</p>
 </li>
-<li style="display: flex; flex-direction: column; gap: 10px; border-top: 1px solid #3A3A3F; padding-top: 20px">
-<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 15px; font-weight: 800; color: #E39A2B">02</span>
-<h3 style="margin: 0; font-size: 20px; font-weight: 600">Design</h3>
-<p style="margin: 0; font-size: 16px; line-height: 1.6; color: #C9C7BF">We plan and prototype before writing code, while changes are still cheap.</p>
-</li>
-<li style="display: flex; flex-direction: column; gap: 10px; border-top: 1px solid #3A3A3F; padding-top: 20px">
-<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 15px; font-weight: 800; color: #E39A2B">03</span>
-<h3 style="margin: 0; font-size: 20px; font-weight: 600">Build</h3>
-<p style="margin: 0; font-size: 16px; line-height: 1.6; color: #C9C7BF">We ship in short cycles you can review and test as we go.</p>
-</li>
-<li style="display: flex; flex-direction: column; gap: 10px; border-top: 1px solid #3A3A3F; padding-top: 20px">
-<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 15px; font-weight: 800; color: #E39A2B">04</span>
-<h3 style="margin: 0; font-size: 20px; font-weight: 600">Run</h3>
-<p style="margin: 0; font-size: 16px; line-height: 1.6; color: #C9C7BF">We host, monitor and keep improving what we've built together.</p>
-</li>
+))}
 </ol>
 </div>
 </section>
 
-<section id="work" style="max-width: 1200px; margin: 0 auto; padding: 112px 32px; display: flex; flex-wrap: wrap; gap: 56px; align-items: flex-start">
-<div style="flex: 1 1 380px; display: flex; flex-direction: column; gap: 20px">
-<p style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px; font-weight: 500; letter-spacing: 2px; color: #5F5E5A">03 / WORK</p>
-<h2 style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 800; font-size: clamp(30px, 3.4vw, 46px); letter-spacing: -1px; line-height: 1.1">See work like yours</h2>
-<p style="margin: 0; max-width: 520px; font-size: 18px; line-height: 1.6; color: #5F5E5A">Every project is built around one client's business, so instead of a generic gallery we share examples that match what you're planning. Tell us a little about your project and we'll send them your way.</p>
-<ul style="margin: 8px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 14px">
-<li style="display: flex; align-items: center; gap: 12px; font-size: 16px; color: #3A3A3F"><svg viewBox="0 0 100 100" width="18" height="18" aria-hidden="true"><polygon points="50,6 88,28 88,72 50,94 12,72 12,28" fill="#E39A2B"></polygon></svg>Examples matched to your project type</li>
-<li style="display: flex; align-items: center; gap: 12px; font-size: 16px; color: #3A3A3F"><svg viewBox="0 0 100 100" width="18" height="18" aria-hidden="true"><polygon points="50,6 88,28 88,72 50,94 12,72 12,28" fill="#E39A2B"></polygon></svg>How each one was scoped, built and launched</li>
-<li style="display: flex; align-items: center; gap: 12px; font-size: 16px; color: #3A3A3F"><svg viewBox="0 0 100 100" width="18" height="18" aria-hidden="true"><polygon points="50,6 88,28 88,72 50,94 12,72 12,28" fill="#E39A2B"></polygon></svg>A short walkthrough call, if you'd like one</li>
+<section id="work" class="container work">
+<div class="work__intro">
+<p class="eyebrow">03 / WORK</p>
+<h2 class="section-title">See work like yours</h2>
+<p class="section-intro section-intro--narrow">Every project is built around one client's business, so instead of a generic gallery we share examples that match what you're planning. Tell us a little about your project and we'll send them your way.</p>
+<ul class="benefit-list">
+{benefits.map((b) => (
+<li><svg viewBox="0 0 100 100" width="18" height="18" aria-hidden="true"><polygon points="50,6 88,28 88,72 50,94 12,72 12,28" fill="#E39A2B"></polygon></svg>{b}</li>
+))}
 </ul>
 </div>
-<div style="flex: 1 1 440px; background: #FFFFFF; border: 1px solid #E2E0D8; border-radius: 16px; padding: 36px; box-sizing: border-box">
-<!-- TODO: point this form at the form service (e.g. Formspree) with action="..." method="POST" -->
-<form id="portfolio-form" style="display: flex; flex-direction: column; gap: 20px">
-<h3 style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 22px; font-weight: 800; letter-spacing: -0.5px">Request our portfolio</h3>
-<div style="display: flex; flex-direction: column; gap: 8px">
-<label for="pf-name" style="font-size: 14px; font-weight: 600; color: #3A3A3F">Name</label>
-<input id="pf-name" name="name" type="text" autocomplete="name" required style="width: 100%; box-sizing: border-box; min-height: 48px; padding: 12px 14px; border: 1px solid #CFCCC2; border-radius: 8px; background: #FFFFFF; color: #18181B; font-family: Inter, system-ui, sans-serif; font-size: 16px">
+<div class="form-card">
+{/* TODO: send the form to the form service before showing the thank-you message. */}
+<form id="portfolio-form" class="form">
+<h3 class="card-title">Request our portfolio</h3>
+<div class="field">
+<label for="pf-name" class="field__label">Name</label>
+<input id="pf-name" name="name" type="text" autocomplete="name" required class="field__control">
 </div>
-<div style="display: flex; flex-direction: column; gap: 8px">
-<label for="pf-email" style="font-size: 14px; font-weight: 600; color: #3A3A3F">Work email</label>
-<input id="pf-email" name="email" type="email" autocomplete="email" required style="width: 100%; box-sizing: border-box; min-height: 48px; padding: 12px 14px; border: 1px solid #CFCCC2; border-radius: 8px; background: #FFFFFF; color: #18181B; font-family: Inter, system-ui, sans-serif; font-size: 16px">
+<div class="field">
+<label for="pf-email" class="field__label">Work email</label>
+<input id="pf-email" name="email" type="email" autocomplete="email" required class="field__control">
 </div>
-<div style="display: flex; flex-direction: column; gap: 8px">
-<label for="pf-type" style="font-size: 14px; font-weight: 600; color: #3A3A3F">What are you planning?</label>
-<select id="pf-type" name="type" style="width: 100%; box-sizing: border-box; min-height: 48px; padding: 12px 14px; border: 1px solid #CFCCC2; border-radius: 8px; background: #FFFFFF; color: #18181B; font-family: Inter, system-ui, sans-serif; font-size: 16px">
-<option>A new website or redesign</option>
-<option>An online store or Shopify app</option>
-<option>A mobile app or custom software</option>
-<option>AI or workflow automation</option>
-<option>Cloud or IT consulting</option>
-<option>Something else</option>
+<div class="field">
+<label for="pf-type" class="field__label">What are you planning?</label>
+<select id="pf-type" name="type" class="field__control">
+{projectTypes.map((t) => <option>{t}</option>)}
 </select>
 </div>
-<div style="display: flex; flex-direction: column; gap: 8px">
-<label for="pf-note" style="font-size: 14px; font-weight: 600; color: #3A3A3F">Anything else we should know? (optional)</label>
-<textarea id="pf-note" name="note" rows="3" style="width: 100%; box-sizing: border-box; min-height: 48px; padding: 12px 14px; border: 1px solid #CFCCC2; border-radius: 8px; background: #FFFFFF; color: #18181B; font-family: Inter, system-ui, sans-serif; font-size: 16px; resize: vertical"></textarea>
+<div class="field">
+<label for="pf-note" class="field__label">Anything else we should know? (optional)</label>
+<textarea id="pf-note" name="note" rows="3" class="field__control"></textarea>
 </div>
-<button type="submit" style="min-height: 52px; padding: 0 24px; border: 0; border-radius: 8px; background: #18181B; color: #F6F5F1; font-family: Inter, system-ui, sans-serif; font-size: 16px; font-weight: 600; cursor: pointer">Send me examples</button>
-<p style="margin: 0; font-size: 13px; line-height: 1.5; color: #5F5E5A">We'll only use your details to reply about your project. See our <a href="privacy.html" style="color: #5F5E5A">privacy policy</a>.</p>
+<button type="submit" class="form__submit">Send me examples</button>
+<p class="form__note">We'll only use your details to reply about your project. See our <a href="privacy.html">privacy policy</a>.</p>
 </form>
-<div id="pf-thanks" role="status" tabindex="-1" hidden style="display: flex; flex-direction: column; gap: 16px; padding: 24px 0">
+<div id="pf-thanks" role="status" tabindex="-1" hidden class="form-thanks">
 <svg viewBox="0 0 100 100" width="48" height="48" aria-hidden="true"><polygon points="50,6 88,28 88,72 50,94 12,72 12,28" fill="#E39A2B"></polygon><polyline points="32,52 45,64 68,40" fill="none" stroke="#18181B" stroke-width="8" stroke-linecap="square"></polyline></svg>
-<h3 style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 22px; font-weight: 800; letter-spacing: -0.5px">Thanks, request received.</h3>
-<p style="margin: 0; font-size: 16px; line-height: 1.6; color: #5F5E5A">We'll reply with examples that match your project, and a time to talk if you'd like one.</p>
-<button type="button" id="pf-reset" style="align-self: flex-start; min-height: 44px; padding: 0 18px; border: 1px solid #CFCCC2; border-radius: 8px; background: #FFFFFF; color: #18181B; font-family: Inter, system-ui, sans-serif; font-size: 15px; font-weight: 600; cursor: pointer">Send another request</button>
+<h3 class="card-title">Thanks, request received.</h3>
+<p class="form-thanks__text">We'll reply with examples that match your project, and a time to talk if you'd like one.</p>
+<button type="button" id="pf-reset" class="form-thanks__reset">Send another request</button>
 </div>
 </div>
 </section>
 
-<section id="government" style="background: #ECEAE3">
-<div style="max-width: 1200px; margin: 0 auto; padding: 104px 32px; display: flex; flex-wrap: wrap; gap: 48px">
-<div style="flex: 1 1 360px; display: flex; flex-direction: column; gap: 16px">
-<p style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px; font-weight: 500; letter-spacing: 2px; color: #5F5E5A">04 / PUBLIC SECTOR</p>
-<h2 style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 800; font-size: clamp(30px, 3.4vw, 46px); letter-spacing: -1px; line-height: 1.1">Ready for government work</h2>
-<p style="margin: 0; font-size: 18px; line-height: 1.6; color: #3A3A3F">A Maryland small business delivering software development and IT services to agencies and prime contractors. Teaming inquiries are welcome.</p>
-<a href="#contact" style="align-self: flex-start; display: inline-flex; align-items: center; min-height: 48px; padding: 0 20px; border-radius: 8px; border: 1px solid #18181B; color: #18181B; font-size: 16px; font-weight: 600; text-decoration: none; margin-top: 8px">Capability statement [PDF coming soon]</a>
+<section id="government" class="section-sand">
+<div class="container gov">
+<div class="gov__intro">
+<p class="eyebrow">04 / PUBLIC SECTOR</p>
+<h2 class="section-title">Ready for government work</h2>
+<p class="gov__text">A Maryland Company delivering Software Development and IT Services to Agencies and prime contractors. Teaming inquiries are welcome.</p>
+<a href="#contact" class="btn btn--md btn--outline gov__cta">Capability statement [PDF coming soon]</a>
 </div>
-<dl style="flex: 1 1 420px; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 24px 32px">
-<div style="display: flex; flex-direction: column; gap: 6px">
-<dt style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; font-weight: 500; letter-spacing: 1px; color: #5F5E5A">NAICS</dt>
-<dd style="margin: 0; font-size: 16px; line-height: 1.6">541511 Custom computer programming<br>541512 Computer systems design<br>541519 Other computer services</dd>
+<dl class="gov-codes">
+{govCodes.map((c) => (
+<div class="gov-codes__item">
+<dt>{c.label}</dt>
+<dd>{c.lines.map((line, i) => <Fragment>{i > 0 && <br />}{line}</Fragment>)}</dd>
 </div>
-<div style="display: flex; flex-direction: column; gap: 6px">
-<dt style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; font-weight: 500; letter-spacing: 1px; color: #5F5E5A">PSC</dt>
-<dd style="margin: 0; font-size: 16px; line-height: 1.6">DA01 Application development</dd>
-</div>
-<div style="display: flex; flex-direction: column; gap: 6px">
-<dt style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; font-weight: 500; letter-spacing: 1px; color: #5F5E5A">UEI</dt>
-<dd style="margin: 0; font-size: 16px; line-height: 1.6">[PENDING SAM.GOV]</dd>
-</div>
-<div style="display: flex; flex-direction: column; gap: 6px">
-<dt style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; font-weight: 500; letter-spacing: 1px; color: #5F5E5A">CAGE</dt>
-<dd style="margin: 0; font-size: 16px; line-height: 1.6">[PENDING]</dd>
-</div>
-<div style="display: flex; flex-direction: column; gap: 6px">
-<dt style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; font-weight: 500; letter-spacing: 1px; color: #5F5E5A">BUSINESS TYPE</dt>
-<dd style="margin: 0; font-size: 16px; line-height: 1.6">Small business<br>Maryland LLC</dd>
-</div>
+))}
 </dl>
 </div>
 </section>
 
-<section id="about" style="max-width: 1200px; margin: 0 auto; padding: 112px 32px; display: flex; flex-wrap: wrap; gap: 48px">
-<div style="flex: 1 1 360px; display: flex; flex-direction: column; gap: 16px">
-<p style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px; font-weight: 500; letter-spacing: 2px; color: #5F5E5A">05 / ABOUT</p>
-<h2 style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 800; font-size: clamp(30px, 3.4vw, 46px); letter-spacing: -1px; line-height: 1.1">One partner for the whole system</h2>
+<section id="about" class="container about">
+<div class="about__head">
+<p class="eyebrow">05 / ABOUT</p>
+<h2 class="section-title">One partner for the whole system</h2>
 </div>
-<div style="flex: 1 1 480px; display: flex; flex-direction: column; gap: 18px; font-size: 18px; line-height: 1.7; color: #3A3A3F">
-<p style="margin: 0">Hivecrest Systems is a Maryland software and IT services company. We design, build and support the technology that businesses and public agencies depend on, from a first website to cloud infrastructure.</p>
-<p style="margin: 0">We build the way a honeycomb does: small, solid pieces that fit together into one strong system. You get a team for the whole picture, plain answers on cost and timing, and support that continues after launch.</p>
+<div class="about__body">
+<p>Hivecrest Systems is a Software and IT Services company. We design, build and support the technology that businesses and public agencies depend on, from a first website to cloud infrastructure.</p>
+<p>We build the way a honeycomb does: small, solid pieces that fit together into one strong system. You get a team for the whole picture, plain answers on cost and timing, and support that continues after launch.</p>
 </div>
 </section>
 
-<footer id="contact" style="background: #141416; color: #EDEBE4">
-<div style="max-width: 1200px; margin: 0 auto; padding: 104px 32px 56px; display: flex; flex-direction: column; gap: 72px">
-<div style="display: flex; flex-direction: column; gap: 20px; align-items: flex-start">
-<h2 style="margin: 0; max-width: 760px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 800; font-size: clamp(32px, 4vw, 56px); letter-spacing: -1.5px; line-height: 1.08">Have a system that needs building?</h2>
-<p style="margin: 0; max-width: 600px; font-size: 18px; line-height: 1.6; color: #C9C7BF">Tell us what you're working on, and we'll set up a free 30-minute call.</p>
-<a href="mailto:hello@hivecrestsystems.com" style="display: inline-flex; align-items: center; min-height: 52px; padding: 0 24px; border-radius: 8px; background: #E39A2B; color: #18181B; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 16px; font-weight: 800; text-decoration: none">hello@hivecrestsystems.com</a>
+{/* Phones and small tablets: shown once the hero buttons scroll away, hidden again at the footer. */}
+<a href="#contact" id="float-cta" class="float-cta"><svg viewBox="0 0 100 100" width="18" height="18" aria-hidden="true"><polygon points="50,6 88,28 88,72 50,94 12,72 12,28" fill="#18181B"></polygon></svg>Book a call</a>
+</main>
+
+<footer id="contact" class="site-footer">
+<div class="container footer-main">
+<div class="footer-cta">
+<h2 class="footer-cta__title">Have a system that needs building?</h2>
+<p class="footer-cta__text">Tell us what you're working on, and we'll set up a free 30-minute call.</p>
+<a href="mailto:hello@hivecrestsystems.com" class="btn btn--honey footer-cta__email">hello@hivecrestsystems.com</a>
 </div>
-<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; border-top: 1px solid #2E2E33; padding-top: 28px; font-size: 14px; color: #A3A29C">
-<div style="display: flex; align-items: center; gap: 12px">
-<svg viewBox="0 0 100 100" width="28" height="28" aria-hidden="true">
-<polygon points="50,21.5 64.29,29.75 64.29,46.25 50,54.5 35.71,46.25 35.71,29.75" fill="#E39A2B"></polygon>
-<polyline points="42.5,43 50,35.5 57.5,43" fill="none" stroke="#141416" stroke-width="3.6" stroke-linecap="square"></polyline>
-<polygon points="34.41,48.5 48.7,56.75 48.7,73.25 34.41,81.5 20.12,73.25 20.12,56.75" fill="#EDEBE4"></polygon>
-<polygon points="65.59,48.5 79.88,56.75 79.88,73.25 65.59,81.5 51.3,73.25 51.3,56.75" fill="#EDEBE4"></polygon>
-</svg>
-<span>© 2026 Hivecrest Systems LLC · Maryland</span>
-</div>
-<nav aria-label="Legal" style="display: flex; gap: 24px">
-<a href="privacy.html" style="color: #A3A29C">Privacy</a>
-<a href="#top" style="color: #A3A29C">Accessibility</a>
-</nav>
-</div>
+<FooterBar variant="ruled" />
 </div>
 </footer>
 
-</div>
-<script is:inline>
-(function () {
-  // Typing line in the hero: cycles through phrases. Skipped for reduced motion.
-  var el = document.getElementById('typed');
-  var phrases = ['websites that sell.', 'apps people actually use.', 'automations that give you hours back.', 'cloud that grows with you.', 'IT that just works.'];
-  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (el && !reduce) {
-    var p = 0, n = phrases[0].length, dir = -1, hold = 36;
-    setInterval(function () {
-      if (hold > 0) { hold--; return; }
-      if (dir === -1) {
-        if (n > 0) { n--; } else { dir = 1; p = (p + 1) % phrases.length; hold = 4; }
-      } else {
-        if (n < phrases[p].length) { n++; } else { dir = -1; hold = 36; }
+<script>
+  // Phone menu: the Menu button shows and hides the main links (see .menu-toggle in site.css).
+  const toggle = document.getElementById('menu-toggle');
+  const nav = document.getElementById('main-nav');
+  const topbar = toggle?.closest('.topbar');
+  if (toggle && nav && topbar) {
+    const label = toggle.querySelector('.menu-toggle__label');
+    const isOpen = () => toggle.getAttribute('aria-expanded') === 'true';
+    const setOpen = (open: boolean) => {
+      topbar.classList.toggle('is-open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+      if (label) label.textContent = open ? 'Close' : 'Menu';
+    };
+    toggle.addEventListener('click', () => setOpen(!isOpen()));
+    // Following a link, pressing Escape or tapping elsewhere closes the menu.
+    nav.addEventListener('click', (event) => {
+      if ((event.target as Element).closest('a')) setOpen(false);
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && isOpen()) {
+        setOpen(false);
+        toggle.focus();
       }
-      el.textContent = phrases[p].slice(0, n);
+    });
+    document.addEventListener('click', (event) => {
+      if (isOpen() && !topbar.contains(event.target as Node)) setOpen(false);
+    });
+  }
+
+  // Floating "Book a call" on phones: visible between the hero buttons and the footer.
+  const floatCta = document.getElementById('float-cta');
+  const heroButtons = document.querySelector('.hero .button-row');
+  const footer = document.getElementById('contact');
+  if (floatCta && heroButtons && footer && 'IntersectionObserver' in window) {
+    let pastHero = false;
+    let atFooter = false;
+    const update = () => floatCta.classList.toggle('is-visible', pastHero && !atFooter);
+    new IntersectionObserver(([entry]) => {
+      pastHero = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+      update();
+    }).observe(heroButtons);
+    new IntersectionObserver(([entry]) => {
+      atFooter = entry.isIntersecting;
+      update();
+    }).observe(footer);
+  }
+
+  // Typing line in the hero: cycles through phrases. Skipped for reduced motion.
+  const typed = document.getElementById('typed');
+  const phrases: string[] = JSON.parse(typed?.dataset.phrases ?? '[]');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (typed && phrases.length > 0 && !reduceMotion) {
+    let phrase = 0;
+    let length = phrases[0].length;
+    let direction = -1;
+    let hold = 36;
+    setInterval(() => {
+      if (hold > 0) {
+        hold--;
+        return;
+      }
+      if (direction === -1) {
+        if (length > 0) {
+          length--;
+        } else {
+          direction = 1;
+          phrase = (phrase + 1) % phrases.length;
+          hold = 4;
+        }
+      } else if (length < phrases[phrase].length) {
+        length++;
+      } else {
+        direction = -1;
+        hold = 36;
+      }
+      typed.textContent = phrases[phrase].slice(0, length);
     }, 55);
   }
 
   // Portfolio request form. Currently only swaps to the thank-you state.
   // TODO: send the data to the form service before showing the thank-you message.
-  var form = document.getElementById('portfolio-form');
-  var thanks = document.getElementById('pf-thanks');
-  var reset = document.getElementById('pf-reset');
+  const form = document.getElementById('portfolio-form') as HTMLFormElement | null;
+  const thanks = document.getElementById('pf-thanks');
+  const reset = document.getElementById('pf-reset');
   if (form && thanks) {
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
       form.hidden = true;
       thanks.hidden = false;
       thanks.focus();
     });
-  }
-  if (reset && form && thanks) {
-    reset.addEventListener('click', function () {
+    reset?.addEventListener('click', () => {
       form.reset();
       thanks.hidden = true;
       form.hidden = false;
     });
   }
-})();
 </script>
 </BaseLayout>

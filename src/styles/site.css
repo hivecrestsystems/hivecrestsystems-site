@@ -1,0 +1,801 @@
+/* Hivecrest Systems site styles. Colours and type come from the brand tokens. */
+/* Brand colours, type, radii and the self-hosted @font-face rules. */
+@import '../../brand/tokens.css';
+
+/* Site-only colours that are not brand tokens. */
+:root {
+  --hc-field-border: #CFCCC2;
+  --hc-divider-dark: #2E2E33;
+  --hc-gutter: 32px;
+}
+
+/* ---------- Base ---------- */
+body {
+  margin: 0;
+  background: var(--hc-paper);
+  color: var(--hc-charcoal);
+  font-family: var(--hc-font-sans);
+}
+/* Zero specificity, so any link with its own colour keeps it on hover. */
+:where(a) { color: var(--hc-charcoal); }
+:where(a:hover) { color: var(--hc-stone); }
+[hidden] { display: none !important; }
+
+/* ---------- Layout ---------- */
+.container {
+  max-width: var(--hc-max-width);
+  margin: 0 auto;
+}
+
+/* ---------- Type ---------- */
+.eyebrow {
+  margin: 0;
+  font-family: var(--hc-font-mono);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  color: var(--hc-stone);
+}
+.eyebrow--honey { color: var(--hc-honey); }
+
+.section-title {
+  margin: 0;
+  font-family: var(--hc-font-mono);
+  font-weight: 800;
+  font-size: clamp(30px, 3.4vw, 46px);
+  letter-spacing: -1px;
+  line-height: 1.1;
+}
+.section-intro {
+  margin: 0;
+  max-width: 640px;
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--hc-stone);
+}
+.section-intro--narrow { max-width: 520px; }
+.section-intro--on-dark { color: var(--hc-soft-on-dark); }
+
+.item-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+.card-title {
+  margin: 0;
+  font-family: var(--hc-font-mono);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 52px;
+  padding: 0 24px;
+  border-radius: var(--hc-radius-sm);
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.btn--sm { min-height: 44px; padding: 0 18px; font-size: 15px; }
+.btn--md { min-height: 48px; padding: 0 20px; }
+.btn--honey { background: var(--hc-honey); color: var(--hc-charcoal); }
+.btn--ghost-dark { border: 1px solid var(--hc-stone); color: var(--hc-light-text); }
+.btn--outline { border: 1px solid var(--hc-charcoal); color: var(--hc-charcoal); }
+
+/* ---------- Header ---------- */
+.site-header {
+  position: relative;
+  overflow: hidden;
+  background: var(--hc-night);
+  color: var(--hc-light-text);
+}
+.topbar {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px var(--hc-gutter);
+}
+.brand-link {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--hc-light-text);
+}
+.brand-logo {
+  display: block;
+  width: 264px;
+  max-width: 100%;
+  height: auto; /* scales down only on screens too narrow for the full 264px */
+}
+.main-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 28px;
+  font-size: 15px;
+  font-weight: 500;
+}
+.main-nav__link {
+  color: var(--hc-light-text);
+  text-decoration: none;
+}
+.main-nav .btn { font-size: inherit; }
+
+/* Phone menu. Below 820px the links no longer fit beside the logo, so they move
+   into a panel behind a Menu button. Without scripts (no .js class on <html>)
+   the links simply wrap below the logo instead. */
+.menu-toggle,
+.main-nav__num,
+.main-nav__cta-icon { display: none; }
+.menu-toggle__icon--close { display: none; }
+.is-open .menu-toggle__icon--open { display: none; }
+.is-open .menu-toggle__icon--close { display: block; }
+
+@media (max-width: 819px) {
+  .js .topbar--menu { flex-wrap: nowrap; }
+  .js .menu-toggle {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1px solid var(--hc-body-gray);
+    border-radius: var(--hc-radius-sm);
+    background: transparent;
+    color: var(--hc-light-text);
+    font: 500 15px/1 var(--hc-font-sans);
+    cursor: pointer;
+  }
+  .js .main-nav { display: none; }
+  .js .is-open .main-nav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 8px var(--hc-gutter) 28px;
+    border-top: 1px solid var(--hc-divider-dark);
+    border-bottom: 1px solid var(--hc-divider-dark);
+    background: var(--hc-charcoal);
+    box-shadow: 0 24px 40px rgb(0 0 0 / 45%);
+    font-size: 18px;
+  }
+  .js .main-nav__link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 56px;
+    border-bottom: 1px solid var(--hc-divider-dark);
+  }
+  .js .main-nav__num {
+    display: inline;
+    font-family: var(--hc-font-mono);
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: var(--hc-muted-on-dark);
+  }
+  .js .main-nav .main-nav__cta {
+    justify-content: center;
+    gap: 10px;
+    min-height: 52px;
+    margin-top: 24px;
+    font-size: 17px;
+  }
+  .js .main-nav__cta-icon { display: block; }
+}
+/* On the narrowest phones the button shows only its icon, leaving room for the logo. */
+@media (max-width: 359px) {
+  .js .menu-toggle { padding: 0 12px; }
+  .menu-toggle__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* Floating "Book a call" for the same screens as the menu. The script shows it
+   (.is-visible) between the hero buttons and the footer. */
+.float-cta { display: none; }
+@media (max-width: 819px) {
+  .js .float-cta {
+    position: fixed;
+    right: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    z-index: 50;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 52px;
+    padding: 0 22px 0 16px;
+    border-radius: 999px;
+    background: var(--hc-honey);
+    color: var(--hc-charcoal);
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 10px 28px rgb(0 0 0 / 35%);
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0.2s;
+  }
+  .js .float-cta.is-visible {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .float-cta { transition: none !important; }
+}
+
+/* ---------- Hero ---------- */
+/* The honeycomb has three placements, each keeping its cells clear of the text
+   (tests/checks.spec.ts checks this at many widths):
+     1200px and up   cluster to the right of the headline (the original design)
+     720 to 1199px   smaller cluster beside the two-line headline, honey cell level with its second line
+     up to 719px     a strip of cells along the bottom of the hero */
+:root { --hero-title-size: clamp(40px, 5.4vw, 76px); }
+.hero-honeycomb {
+  position: absolute;
+  right: -80px;
+  top: 60px;
+  width: 620px;
+  height: 620px;
+  pointer-events: none;
+}
+.hero-strip { display: none; }
+@media (min-width: 720px) and (max-width: 1199px) {
+  :root { --hero-comb-size: clamp(360px, 46vw, 480px); }
+  .hero-honeycomb {
+    right: -40px;
+    /* The second headline line is centred 226px (header, padding, eyebrow and gap)
+       plus 1.575 title sizes below the top of the header. The honey cell's centre
+       is 35% of the way down the drawing. */
+    top: calc(226px + 1.575 * var(--hero-title-size) - 0.35 * var(--hero-comb-size));
+    width: var(--hero-comb-size);
+    height: var(--hero-comb-size);
+  }
+}
+@media (max-width: 719px) {
+  .hero-honeycomb { display: none; }
+  .hero-strip {
+    display: block;
+    position: absolute;
+    right: 0;
+    bottom: -22px;
+    pointer-events: none;
+    mask-image: linear-gradient(to right, rgb(0 0 0 / 15%), #000 65%);
+  }
+}
+.hero { position: relative; }
+.hero__inner {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 88px var(--hc-gutter) 128px;
+}
+/* Room for the strip: its visible 118px plus a 56px gap below the buttons. */
+@media (max-width: 719px) {
+  .hero__inner { padding-top: 48px; padding-bottom: 174px; }
+}
+.hero__title {
+  margin: 0;
+  max-width: 900px;
+  font-family: var(--hc-font-mono);
+  font-weight: 800;
+  font-size: var(--hero-title-size);
+  line-height: 1.05;
+  letter-spacing: -2px;
+}
+/* From 720px the headline always breaks after "Strong systems," so the
+   honeycomb has the space to the right of it. */
+@media (min-width: 720px) {
+  .hero__title-line { display: block; }
+}
+.hero__terminal {
+  margin: 0;
+  min-height: 1.5em;
+  font-family: var(--hc-font-mono);
+  font-size: clamp(17px, 2vw, 24px);
+  font-weight: 500;
+  color: var(--hc-light-text);
+}
+.hero__prompt,
+.hero__typed { color: var(--hc-honey); }
+/* The live line sits on top of an invisible copy of the longest phrase, so the
+   paragraph below never jumps as phrases of different lengths type out. */
+.hero__terminal { display: grid; }
+.hero__terminal-line { grid-area: 1 / 1; }
+.hero__terminal-sizer { visibility: hidden; }
+.hero__terminal-sizer .hc-cursor { animation: none; }
+.hero__lede {
+  margin: 0;
+  max-width: 640px;
+  font-size: 20px;
+  line-height: 1.6;
+  color: var(--hc-soft-on-dark);
+}
+/* Beside the 720-1199px cluster, the typing line and paragraph stop short of the
+   cells, which take up the right 77% of the drawing. */
+@media (min-width: 720px) and (max-width: 1199px) {
+  .hero__terminal { max-width: calc(100% + 48px - 0.77 * var(--hero-comb-size)); }
+  .hero__lede { max-width: min(640px, calc(100% + 48px - 0.77 * var(--hero-comb-size))); }
+}
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+@keyframes hc-blink { 50% { opacity: 0; } }
+.hc-cursor {
+  display: inline-block;
+  width: 0.55em;
+  height: 1.05em;
+  margin-left: 2px;
+  vertical-align: -0.15em;
+  background: var(--hc-honey);
+  animation: hc-blink 1s step-end infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hc-cursor { animation: none; }
+}
+
+/* ---------- Section shells ---------- */
+.section-head {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.section-dark {
+  background: var(--hc-charcoal);
+  color: var(--hc-light-text);
+}
+.section-sand { background: var(--hc-sand); }
+
+/* ---------- Services ---------- */
+.services {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  padding: 112px var(--hc-gutter);
+}
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  gap: 20px;
+}
+.service-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 28px;
+  background: var(--hc-white);
+  border: 1px solid var(--hc-card-border);
+  border-radius: var(--hc-radius-md);
+}
+.service-card__text {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--hc-stone);
+}
+.service-card__tags {
+  margin: 0;
+  font-family: var(--hc-font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--hc-body-gray);
+}
+
+/* ---------- How we work ---------- */
+.process {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  padding: 104px var(--hc-gutter);
+}
+.process-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 32px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.process-step {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid var(--hc-body-gray);
+  padding-top: 20px;
+}
+.process-step__num {
+  font-family: var(--hc-font-mono);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--hc-honey);
+}
+.process-step__text {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--hc-soft-on-dark);
+}
+
+/* ---------- Work / portfolio request ---------- */
+.work {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 56px;
+  align-items: flex-start;
+  padding: 112px var(--hc-gutter);
+}
+.work__intro {
+  flex: 1 1 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.benefit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.benefit-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+  color: var(--hc-body-gray);
+}
+.form-card {
+  flex: 1 1 440px;
+  box-sizing: border-box;
+  padding: 36px;
+  background: var(--hc-white);
+  border: 1px solid var(--hc-card-border);
+  border-radius: var(--hc-radius-lg);
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.field__label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--hc-body-gray);
+}
+.field__control {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid var(--hc-field-border);
+  border-radius: var(--hc-radius-sm);
+  background: var(--hc-white);
+  color: var(--hc-charcoal);
+  font-family: var(--hc-font-sans);
+  font-size: 16px;
+}
+textarea.field__control { resize: vertical; }
+.form__submit {
+  min-height: 52px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: var(--hc-radius-sm);
+  background: var(--hc-charcoal);
+  color: var(--hc-paper);
+  font-family: var(--hc-font-sans);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.form__note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--hc-stone);
+}
+.form__note a { color: var(--hc-stone); }
+.form-thanks {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px 0;
+}
+.form-thanks__text {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--hc-stone);
+}
+.form-thanks__reset {
+  align-self: flex-start;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--hc-field-border);
+  border-radius: var(--hc-radius-sm);
+  background: var(--hc-white);
+  color: var(--hc-charcoal);
+  font-family: var(--hc-font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ---------- Government ---------- */
+.gov {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 48px;
+  padding: 104px var(--hc-gutter);
+}
+.gov__intro {
+  flex: 1 1 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.gov__text {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--hc-body-gray);
+}
+.gov__cta {
+  align-self: flex-start;
+  margin-top: 8px;
+}
+.gov-codes {
+  flex: 1 1 420px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 24px 32px;
+  margin: 0;
+}
+.gov-codes__item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.gov-codes dt {
+  font-family: var(--hc-font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  color: var(--hc-stone);
+}
+.gov-codes dd {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* ---------- About ---------- */
+.about {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 48px;
+  padding: 112px var(--hc-gutter);
+}
+.about__head {
+  flex: 1 1 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.about__body {
+  flex: 1 1 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--hc-body-gray);
+}
+.about__body p { margin: 0; }
+
+/* ---------- Footer ---------- */
+.site-footer {
+  background: var(--hc-night);
+  color: var(--hc-light-text);
+}
+.site-footer--compact { color: var(--hc-muted-on-dark); }
+.footer-main {
+  display: flex;
+  flex-direction: column;
+  gap: 72px;
+  padding: 104px var(--hc-gutter) 56px;
+}
+.footer-cta {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: flex-start;
+}
+.footer-cta__title {
+  margin: 0;
+  max-width: 760px;
+  font-family: var(--hc-font-mono);
+  font-weight: 800;
+  font-size: clamp(32px, 4vw, 56px);
+  letter-spacing: -1.5px;
+  line-height: 1.08;
+}
+.footer-cta__text {
+  margin: 0;
+  max-width: 600px;
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--hc-soft-on-dark);
+}
+.footer-cta__email {
+  font-family: var(--hc-font-mono);
+  font-weight: 800;
+}
+@media (max-width: 359px) {
+  .footer-cta__email { padding: 0 16px; font-size: 14px; }
+}
+.footer-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 14px;
+  color: var(--hc-muted-on-dark);
+}
+.footer-bar--ruled {
+  border-top: 1px solid var(--hc-divider-dark);
+  padding-top: 28px;
+}
+.footer-bar--compact { padding: 28px var(--hc-gutter); }
+.footer-bar__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.legal-nav {
+  display: flex;
+  gap: 24px;
+}
+.legal-nav a { color: var(--hc-muted-on-dark); }
+.legal-nav a[aria-current="page"] { color: var(--hc-light-text); }
+
+/* ---------- Privacy policy ---------- */
+.page-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 56px var(--hc-gutter) 72px;
+}
+.page-hero__title {
+  margin: 0;
+  font-family: var(--hc-font-mono);
+  font-weight: 800;
+  font-size: clamp(36px, 4.4vw, 60px);
+  line-height: 1.05;
+  letter-spacing: -1.5px;
+}
+.page-hero__meta {
+  margin: 0;
+  font-size: 16px;
+  color: var(--hc-soft-on-dark);
+}
+.legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 56px;
+  align-items: flex-start;
+  padding: 72px var(--hc-gutter) 112px;
+}
+.toc {
+  flex: 1 1 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.toc__label {
+  margin: 0;
+  font-family: var(--hc-font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  color: var(--hc-stone);
+}
+.toc__list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding-left: 20px;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--hc-body-gray);
+}
+.toc__list a { color: var(--hc-body-gray); }
+.legal__body {
+  flex: 999 1 560px;
+  min-width: 0;
+  max-width: 760px;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+.legal__intro {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.7;
+  color: var(--hc-charcoal);
+}
+.legal__section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.legal__section h2 {
+  margin: 0;
+  font-family: var(--hc-font-mono);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1.25;
+}
+.legal__section p {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--hc-body-gray);
+}
+.legal__section strong { color: var(--hc-charcoal); }
+.legal__section ul {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding-left: 22px;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--hc-body-gray);
+}
+.legal__section--card {
+  padding: 32px;
+  background: var(--hc-white);
+  border: 1px solid var(--hc-card-border);
+  border-radius: var(--hc-radius-md);
+}
+.legal__section .legal__address { color: var(--hc-charcoal); }
+.legal__address a {
+  color: var(--hc-charcoal);
+  font-weight: 600;
+}

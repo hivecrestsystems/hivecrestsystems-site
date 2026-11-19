@@ -7,8 +7,7 @@ export default defineConfig({
     // Emit privacy.html (not privacy/index.html) so existing links keep working.
     format: 'file',
   },
-  // Iteration 1 ships the design hand-off exactly as delivered.
-  // Minification is turned on in iteration 2.
-  compressHTML: false,
+  // Collapse whitespace in the HTML output. CSS and JS are minified by the build.
+  compressHTML: true,
   devToolbar: { enabled: false },
 });

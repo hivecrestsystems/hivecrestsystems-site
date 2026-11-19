@@ -1,4 +1,14 @@
 ---
+import '../styles/site.css';
+// Every font weight appears above the fold, so all five are preloaded.
+import interRegular from '../../brand/fonts/inter-latin-400-normal.woff2?url';
+import interMedium from '../../brand/fonts/inter-latin-500-normal.woff2?url';
+import interSemibold from '../../brand/fonts/inter-latin-600-normal.woff2?url';
+import monoMedium from '../../brand/fonts/jetbrains-mono-latin-500-normal.woff2?url';
+import monoExtraBold from '../../brand/fonts/jetbrains-mono-latin-800-normal.woff2?url';
+
+const fontPreloads = [monoExtraBold, monoMedium, interRegular, interMedium, interSemibold];
+
 interface Props {
   /** Page title, also used for og:title. */
   title: string;
@@ -16,6 +26,8 @@ const canonical = new URL(path, Astro.site).href;
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Marks that scripts run, so the phone menu only hides the links when its button works. -->
+<script is:inline>document.documentElement.classList.add('js');</script>
 <title>{title}</title>
 <meta name="description" content={description}>
 <link rel="canonical" href={canonical}>
@@ -30,9 +42,7 @@ const canonical = new URL(path, Astro.site).href;
 <link rel="icon" href="assets/favicon.ico" sizes="any">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;800&display=swap" rel="stylesheet">
+{fontPreloads.map((href) => <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />)}
 <slot name="head" />
 </head>
 <body>
