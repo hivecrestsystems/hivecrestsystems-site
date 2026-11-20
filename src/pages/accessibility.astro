@@ -1,0 +1,88 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import PageIntro from '../components/PageIntro.astro';
+import FooterBar from '../components/FooterBar.astro';
+import { LAUNCH_DATE } from '../data/legal';
+
+// "Last updated" is the date of this statement's latest change: launch day until then.
+const lastUpdated = LAUNCH_DATE;
+---
+<BaseLayout
+  title="Accessibility statement | Hivecrest Systems"
+  description="How we make hivecrestsystems.com accessible: the standard we aim for, how we check it, known limitations, and how to report a problem."
+  path="/accessibility"
+>
+<PageHeader />
+
+<main>
+<PageIntro eyebrow="LEGAL" title="Accessibility statement" meta={`Last updated: ${lastUpdated}`} />
+<div class="container legal">
+
+<nav aria-label="On this page" class="toc">
+<p class="toc__label">ON THIS PAGE</p>
+<ol class="toc__list">
+<li><a href="#a-standard">Our standard</a></li>
+<li><a href="#a-measures">What we've done</a></li>
+<li><a href="#a-testing">How we check</a></li>
+<li><a href="#a-limits">Known limitations</a></li>
+<li><a href="#a-contact">Tell us about a problem</a></li>
+</ol>
+</nav>
+
+<article class="legal__body">
+
+<p class="legal__intro">We want everyone to be able to use hivecrestsystems.com, including people who use a screen reader, a keyboard instead of a mouse, screen magnification or voice control. This statement explains the standard we aim for, how we check the site, what we know falls short, and how to tell us about a problem.</p>
+
+<section id="a-standard" class="legal__section">
+<h2>1. Our standard</h2>
+<p>We aim to meet the Web Content Accessibility Guidelines (WCAG) 2.1 at Level AA. WCAG is published by the World Wide Web Consortium (W3C), and Level AA is the level commonly used for business and government websites.</p>
+<p>If you're working on your own website, our guide to <a href="/guides/website-accessibility-ada">website accessibility and the ADA</a> explains the standard and the rules that apply.</p>
+</section>
+
+<section id="a-measures" class="legal__section">
+<h2>2. What we've done</h2>
+<ul>
+<li>Pages are built from standard links, buttons, headings and page regions, so they work with a keyboard and with assistive technology such as screen readers.</li>
+<li>Keyboard focus shows with your browser's own outline. The phone menu closes with the Escape key and returns you to its button.</li>
+<li>Text has enough contrast with its background to meet WCAG Level AA.</li>
+<li>Form fields have visible labels. If a form can't be sent, the error message is announced to screen readers.</li>
+<li>Buttons are at least 44 pixels tall, so they're easier to tap.</li>
+<li>Pages fit screens as narrow as 320 pixels without scrolling sideways, and the tables in our guides become labelled cards on phones.</li>
+<li>The typing line and the moving honeycomb at the top of the homepage stay still when your device is set to reduce motion. Decorative graphics are hidden from screen readers.</li>
+</ul>
+</section>
+
+<section id="a-testing" class="legal__section">
+<h2>3. How we check</h2>
+<p>Before any change goes live, automated checks run on every page:</p>
+<ul>
+<li>The axe accessibility scanner checks each page against WCAG 2.1 Level AA in Chrome, Firefox and Safari, at desktop and phone sizes.</li>
+<li>Google Lighthouse must give each page an accessibility score of 100.</li>
+<li>The page code is checked for errors that can confuse assistive technology.</li>
+</ul>
+<p>Automated tools can't find every problem, so we welcome reports from the people who use the site.</p>
+</section>
+
+<section id="a-limits" class="legal__section">
+<h2>4. Known limitations</h2>
+<ul>
+<li><strong>Spam check on the portfolio request form.</strong> The form uses Cloudflare Turnstile to tell people from bots. It usually works without you noticing, but it can occasionally ask you to tick a box. If it gets in your way, email us instead and we'll handle your request the same way.</li>
+<li><strong>Links to other websites.</strong> Our guides link to their sources on other websites. We don't control those sites, and they may not meet the same standard.</li>
+</ul>
+</section>
+
+<section id="a-contact" class="legal__section legal__section--card">
+<h2>5. Tell us about a problem</h2>
+<p>If any part of the site doesn't work for you, or you need information in a different format, email us. Tell us which page you were on and what went wrong. We aim to reply within [2 business days].</p>
+<p class="legal__address"><a href="mailto:hello@hivecrestsystems.com?subject=Hivecrest%20Systems%20Accessibility%20Inquiry">hello@hivecrestsystems.com</a></p>
+</section>
+
+</article>
+</div>
+</main>
+
+<footer class="site-footer site-footer--compact">
+<FooterBar variant="compact" current="accessibility" />
+</footer>
+</BaseLayout>

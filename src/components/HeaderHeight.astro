@@ -1,0 +1,17 @@
+---
+// Placed straight after a sticky header. It records the header's height in --header-h,
+// which sizes the homepage hero and keeps in-page links from landing under the header.
+// The header's height changes with the logo's size on phones; site.css has close
+// fallbacks for when scripts don't run.
+---
+<script is:inline>
+  (function () {
+    var header = document.querySelector('.site-header--sticky');
+    if (!header) return;
+    var measure = function () {
+      document.documentElement.style.setProperty('--header-h', header.offsetHeight + 'px');
+    };
+    measure();
+    if ('ResizeObserver' in window) new ResizeObserver(measure).observe(header);
+  })();
+</script>

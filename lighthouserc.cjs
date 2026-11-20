@@ -5,6 +5,8 @@ module.exports = {
     collect: {
       staticDistDir: './dist',
       numberOfRuns: 3,
+      // Score every page, not just the first five found (Lighthouse CI's default).
+      maxAutodiscoverUrls: 0,
     },
     assert: {
       assertMatrix: [

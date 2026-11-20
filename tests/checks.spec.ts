@@ -66,15 +66,13 @@ for (const p of PAGES) {
 
       for (const href of new Set(hrefs)) {
         if (href.startsWith('mailto:')) {
-          if (!/^mailto:[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(href)) problems.push(`bad mailto: ${href}`);
+          // An address, optionally with an encoded subject line (no spaces).
+          if (!/^mailto:[^@\s?]+@[^@\s?]+\.[a-z]{2,}(\?subject=[^\s&]+)?$/i.test(href)) problems.push(`bad mailto: ${href}`);
           continue;
         }
         const url = new URL(href, here);
-        if (url.origin !== here.origin) {
-          const res = await request.get(url.href);
-          if (res.status() >= 400) problems.push(`${href} -> HTTP ${res.status()}`);
-          continue;
-        }
+        // Links to other sites are checked once, in "links to other sites still exist".
+        if (url.origin !== here.origin) continue;
         let html: string | null = null;
         if (url.pathname !== here.pathname) {
           const res = await request.get(url.pathname);
@@ -154,7 +152,9 @@ async function fillPortfolioForm(page: Page) {
 
 test.describe('home page behaviour', () => {
   test('portfolio form sends the request, then thanks the visitor and can be reset', SMOKE, async ({ page }) => {
-    const sent = await fakeFormBackend(page, { status: 200, delayMs: 400 });
+    // Long enough that the "Sending…" state is still showing once the click has finished,
+    // which can take most of a second while the page scrolls the button into view.
+    const sent = await fakeFormBackend(page, { status: 200, delayMs: 1500 });
     await page.goto('/');
     const form = page.locator('#portfolio-form');
     const thanks = page.locator('#pf-thanks');
@@ -279,6 +279,41 @@ test.describe('home page header', () => {
     await expect(toggle).toHaveAttribute('aria-expanded', 'false');
   });
 
+  test('the hero fills the first screen, so the next section only shows on scrolling', SMOKE, async ({ page }) => {
+    // Phone, large phone, iPad Pro 11" both ways, laptop, desktop and a large monitor.
+    for (const [width, height] of [[390, 844], [430, 932], [834, 1194], [1194, 834], [1280, 800], [1440, 900], [2560, 1440]]) {
+      await page.setViewportSize({ width, height });
+      await page.goto('/');
+      const [heroBottom, servicesTop] = await page.evaluate(() => [
+        document.querySelector('.hero')!.getBoundingClientRect().bottom,
+        document.getElementById('services')!.getBoundingClientRect().top,
+      ]);
+      expect(servicesTop, `Services shows on the first screen at ${width}x${height}`).toBeGreaterThanOrEqual(height - 1);
+      // Where the content fits, the hero ends exactly at the bottom of the screen.
+      expect(heroBottom, `hero height at ${width}x${height}`).toBeGreaterThanOrEqual(height - 1);
+    }
+  });
+
+  test('the header stays at the top while scrolling, and section links land below it', SMOKE, async ({ page }) => {
+    for (const width of [390, 1280]) {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto('/');
+      const header = page.locator('.site-header');
+      await page.evaluate(() => window.scrollTo(0, document.getElementById('government')!.offsetTop));
+      await expect.poll(async () => (await header.boundingBox())!.y).toBe(0);
+      await expect(page.locator('#menu-toggle, #main-nav a[href="#services"]').locator('visible=true')).toHaveCount(1);
+
+      await page.evaluate(() => window.scrollTo(0, 0));
+      if (width < 820) await page.locator('#menu-toggle').click();
+      await page.locator('#main-nav a[href="#work"]').click();
+      await expect(page).toHaveURL(/#work$/);
+      const headerBottom = (await header.boundingBox())!.height;
+      await expect
+        .poll(async () => (await page.locator('#work .eyebrow').first().boundingBox())!.y)
+        .toBeGreaterThanOrEqual(headerBottom);
+    }
+  });
+
   test('on wide screens, the links show without a Menu button', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto('/');
@@ -308,6 +343,47 @@ test.describe('home page header', () => {
     await page.evaluate(scrollToServices);
     await page.waitForTimeout(300);
     await expect(page.locator('#float-cta')).toBeHidden();
+  });
+});
+
+test.describe('inner pages', () => {
+  for (const [path, contactId, subject] of [
+    ['/privacy', 'p-contact', 'Hivecrest Systems Privacy Inquiry'],
+    ['/accessibility', 'a-contact', 'Hivecrest Systems Accessibility Inquiry'],
+  ]) {
+    test(`${path}: the header stays at the top, with only the logo and a way home`, SMOKE, async ({ page }) => {
+      await page.goto(path);
+      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 2));
+      const header = page.locator('.site-header');
+      await expect.poll(async () => (await header.boundingBox())!.y).toBe(0);
+      await expect(header.getByRole('link')).toHaveCount(2);
+      // The button reads "Home" on phones.
+      await expect(header.getByRole('link', { name: /^(Back to homepage|Home)$/ })).toBeVisible();
+      // Contact is by email only: no mailing address.
+      const contact = page.locator(`#${contactId}`);
+      const email = contact.getByRole('link', { name: 'hello@hivecrestsystems.com' });
+      await expect(email).toBeVisible();
+      // The email opens with a subject line that says what it's about.
+      const href = new URL((await email.getAttribute('href'))!);
+      expect(href.pathname).toBe('hello@hivecrestsystems.com');
+      expect(href.searchParams.get('subject')).toBe(subject);
+      await expect(contact).not.toContainText(/mailing|\[ADDRESS/i);
+    });
+  }
+
+  test('the header stays at the top while reading, with a button to book a consultation', SMOKE, async ({ page }) => {
+    for (const [width, label] of [[390, 'Book a call'], [1280, 'Book a consultation']] as const) {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto('/guides/small-business-website-cost');
+      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 2));
+      const header = page.locator('.site-header');
+      await expect.poll(async () => (await header.boundingBox())!.y).toBe(0);
+      const book = header.getByRole('link', { name: label });
+      await expect(book).toBeVisible();
+      await book.click();
+      await expect(page).toHaveURL(/#contact$/);
+      await expect(page.locator('#contact')).toBeInViewport();
+    }
   });
 });
 
@@ -378,8 +454,7 @@ test.describe('hero honeycomb motion', () => {
   const near = (a: { x: number; y: number }, b: { x: number; y: number }) => Math.hypot(a.x - b.x, a.y - b.y) < 3;
 
   async function openDesktop(page: Page, reducedMotion: 'reduce' | 'no-preference') {
-    // Tall enough to show the top of the Services section below the hero.
-    await page.setViewportSize({ width: 1440, height: 1400 });
+    await page.setViewportSize({ width: 1440, height: 900 });
     await page.emulateMedia({ reducedMotion });
     await page.goto('/');
     const comb = page.locator('.hero-honeycomb');
@@ -407,11 +482,11 @@ test.describe('hero honeycomb motion', () => {
     await page.mouse.move(hero.text.x, hero.text.y);
     await expect.poll(async () => near(await hero.honey(), hero.home), { message: 'glides home after the pointer leaves the cells' }).toBe(true);
 
-    // Moving out of the hero (onto the Services section) also sends it home.
+    // Moving out of the hero (onto the header bar above it) also sends it home.
     await page.mouse.move(hero.cell.x, hero.cell.y);
     await expect.poll(async () => near(await hero.honey(), hero.cell)).toBe(true);
-    const services = middle(await page.locator('#services .section-title').boundingBox());
-    await page.mouse.move(services.x, services.y);
+    const logo = middle(await page.locator('.topbar .brand-link').boundingBox());
+    await page.mouse.move(logo.x, logo.y);
     await expect.poll(async () => near(await hero.honey(), hero.home), { message: 'goes home when the pointer leaves the hero' }).toBe(true);
   });
 
@@ -443,5 +518,131 @@ test.describe('hero honeycomb motion', () => {
       await page.waitForTimeout(1200);
       expect(near(await honey(), target), 'stays on the tapped cell').toBe(true);
     });
+  });
+});
+
+test.describe('search engines', () => {
+  const SITE = 'https://hivecrestsystems.com';
+
+  test('the sitemap lists every page at its clean address, and each one loads', SMOKE, async ({ request }) => {
+    const response = await request.get('/sitemap.xml');
+    expect(response.status()).toBe(200);
+    const xml = await response.text();
+    const listed = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+    expect(listed.sort()).toEqual(PAGES.map((p) => `${SITE}${p.path}`).sort());
+    for (const url of listed) {
+      expect(url, 'no .html addresses').not.toMatch(/\.html$/);
+      expect((await request.get(url.replace(SITE, ''))).status(), url).toBe(200);
+    }
+  });
+
+  test('robots.txt lets search engines in and points to the sitemap', SMOKE, async ({ request }) => {
+    const text = await (await request.get('/robots.txt')).text();
+    expect(text).toMatch(/^User-agent: \*$/m);
+    expect(text).toMatch(/^Allow: \/$/m);
+    expect(text).toMatch(/^Disallow: \/api\/$/m);
+    expect(text).toContain(`Sitemap: ${SITE}/sitemap.xml`);
+  });
+
+  async function structuredData(page: Page) {
+    const blocks = await page.locator('script[type="application/ld+json"]').allTextContents();
+    expect(blocks).toHaveLength(1);
+    return JSON.parse(blocks[0]) as { '@graph': Record<string, any>[] };
+  }
+
+  test('the homepage describes the business, its services and where it works', SMOKE, async ({ page }) => {
+    await page.goto('/');
+    const graph = (await structuredData(page))['@graph'];
+    expect(graph.map((n) => n['@type'])).toEqual(['Organization', 'ProfessionalService', 'WebSite']);
+    const business = graph[1];
+
+    // The services offered match the service cards on the page.
+    const cards = await page.locator('.service-card .item-title').allTextContents();
+    expect(business.hasOfferCatalog.itemListElement.map((o: any) => o.itemOffered.name)).toEqual(cards);
+
+    // Maryland, the I-95 corridor from Virginia Beach to New York, and remote work nationwide.
+    const areas = business.areaServed.map((a: any) => a.name);
+    for (const name of ['Maryland', 'Virginia Beach', 'Washington', 'Baltimore', 'Philadelphia', 'New York', 'United States']) {
+      expect(areas).toContain(name);
+    }
+    // Contact details match the page; no street address is published.
+    expect(business.email).toBe('hello@hivecrestsystems.com');
+    expect(business.address).toEqual({ '@type': 'PostalAddress', addressRegion: 'MD', addressCountry: 'US' });
+  });
+
+  test('each guide is marked up as an article that matches its page', async ({ page }) => {
+    test.slow(); // visits every guide
+    for (const guide of PAGES.filter((p) => p.path.startsWith('/guides/'))) {
+      await page.goto(guide.path);
+      const [article, breadcrumbs] = (await structuredData(page))['@graph'];
+      expect(article['@type']).toBe('Article');
+      expect(article.headline).toBe(await page.locator('h1').textContent());
+      expect(article.url).toBe(`${SITE}${guide.path}`);
+      expect(new Date(article.datePublished).getTime()).not.toBeNaN();
+      expect(breadcrumbs.itemListElement.map((i: any) => i.name)).toEqual(['Home', 'Guides', article.headline]);
+    }
+  });
+
+  test('every source in a guide became a link', async ({ page }) => {
+    test.slow(); // visits every guide
+    // A [label][key] whose key has no address at the bottom of the file shows up as raw text.
+    for (const guide of PAGES.filter((p) => p.path.startsWith('/guides/'))) {
+      await page.goto(guide.path);
+      const text = await page.locator('article').innerText();
+      expect(text.match(/\]\[[^\]]*\]/g), guide.path).toBeNull();
+    }
+  });
+
+  // One test per page: checking every page in one test is too slow in Safari.
+  for (const p of PAGES) {
+    test(`the ${p.slug} footer says where we work and links to the guides`, async ({ page }) => {
+      await page.goto(p.path);
+      const footer = page.locator('.footer-bar');
+      await expect(footer).toContainText('© 2026 Hivecrest Systems LLC · Maryland, USA');
+      await expect(footer).toContainText(
+        'Based in Maryland, we work with clients across the Mid-Atlantic and remotely nationwide.',
+      );
+      await expect(footer.getByRole('link', { name: 'Guides' })).toHaveAttribute('href', '/guides');
+    });
+  }
+});
+
+test.describe('links to other sites', () => {
+  // Checked in one browser only, and only "gone" answers (404, 410) count as broken:
+  // many sites refuse automated visitors or are briefly down, which says nothing about
+  // whether the link still points at a real page.
+  // These sites answer every automated request with 404, even for pages that load fine in a
+  // browser, so their links can only be checked by hand.
+  const BLOCKS_AUTOMATED_CHECKS = new Set(['ftc.gov', 'www.ftc.gov']);
+
+  test('links to other sites still exist', async ({ page, request }, testInfo) => {
+    test.skip(testInfo.project.name !== 'chromium', 'Checked in one browser only.');
+    test.setTimeout(480_000);
+    const outside = new Map<string, string>();
+    for (const p of PAGES) {
+      await page.goto(p.path);
+      const here = new URL(page.url());
+      for (const href of await page.$$eval('a[href]', (as) => as.map((a) => a.getAttribute('href') ?? ''))) {
+        if (!/^https?:/.test(href) || new URL(href).origin === here.origin) continue;
+        if (BLOCKS_AUTOMATED_CHECKS.has(new URL(href).hostname)) continue;
+        if (!outside.has(href)) outside.set(href, p.path);
+      }
+    }
+    const gone: string[] = [];
+    const links = [...outside];
+    // Eight at a time: the guides cite a few hundred sources, and one at a time takes too long.
+    for (let i = 0; i < links.length; i += 8) {
+      await Promise.all(
+        links.slice(i, i + 8).map(async ([href, from]) => {
+          try {
+            const res = await request.get(href, { timeout: 20_000, maxRedirects: 5 });
+            if ([404, 410].includes(res.status())) gone.push(`${from}: ${href} -> HTTP ${res.status()}`);
+          } catch {
+            // Network trouble isn't proof the link is broken.
+          }
+        }),
+      );
+    }
+    expect(gone.sort()).toEqual([]);
   });
 });
