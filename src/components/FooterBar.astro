@@ -1,22 +1,27 @@
 ---
-// Copyright line and legal links shared by every page footer.
+// Copyright line, where we work, and the footer links shared by every page.
 import CrestIcon from './CrestIcon.astro';
 
 interface Props {
-  /** "ruled" sits under the homepage contact block; "compact" is a footer on its own. */
+  /** "ruled" sits under the contact block; "compact" is a footer on its own. */
   variant: 'ruled' | 'compact';
-  /** Which legal page is open, if any. */
-  current?: 'privacy';
+  /** Which footer link's page is open, if any. */
+  current?: 'guides' | 'privacy' | 'accessibility';
 }
 const { variant, current } = Astro.props;
+const here = (page: Props['current']) => (current === page ? 'page' : undefined);
 ---
 <div class:list={['footer-bar', `footer-bar--${variant}`, { container: variant === 'compact' }]}>
 <div class="footer-bar__brand">
 <CrestIcon size={28} />
+<div class="footer-bar__lines">
 <span>© 2026 Hivecrest Systems LLC · Maryland, USA</span>
+<span class="footer-bar__reach">Based in Maryland, we work with clients across the Mid-Atlantic and remotely nationwide.</span>
 </div>
-<nav aria-label="Legal" class="legal-nav">
-<a href="/privacy" aria-current={current === 'privacy' ? 'page' : undefined}>Privacy</a>
-<a href="#top">Accessibility</a>
+</div>
+<nav aria-label="Footer" class="legal-nav">
+<a href="/guides" aria-current={here('guides')}>Guides</a>
+<a href="/privacy" aria-current={here('privacy')}>Privacy</a>
+<a href="/accessibility" aria-current={here('accessibility')}>Accessibility</a>
 </nav>
 </div>

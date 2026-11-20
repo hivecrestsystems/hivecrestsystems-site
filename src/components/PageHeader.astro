@@ -1,0 +1,26 @@
+---
+// Header bar for inner pages (privacy policy, guides). It stays at the top of the window
+// while the page scrolls, with the logo and a way back to the homepage. The guides add a
+// button to book a consultation, which goes to the contact block at the bottom of the page.
+// The page's title goes in a PageIntro at the start of <main>.
+import SiteLogo from './SiteLogo.astro';
+import HeaderHeight from './HeaderHeight.astro';
+
+interface Props {
+  /** Add a "Book a consultation" button. */
+  book?: boolean;
+}
+const { book = false } = Astro.props;
+---
+<header class="site-header site-header--sticky">
+<div class:list={['container topbar', { 'topbar--book': book }]}>
+<SiteLogo href="/" />
+<div class="topbar__actions">
+<a href="/" class="btn btn--sm btn--ghost-dark topbar__home"><span class="topbar__label-long">Back to homepage</span><span class="topbar__label-short">Home</span></a>
+{book && (
+<a href="#contact" class="btn btn--sm btn--honey"><span class="topbar__label-long">Book a consultation</span><span class="topbar__label-short">Book a call</span></a>
+)}
+</div>
+</div>
+</header>
+<HeaderHeight />

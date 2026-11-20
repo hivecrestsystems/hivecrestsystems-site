@@ -1,0 +1,34 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import PageIntro from '../../components/PageIntro.astro';
+import ContactFooter from '../../components/ContactFooter.astro';
+import { publishedGuides, guidePath, formatDate, readingMinutes } from '../../data/guides';
+
+const guides = await publishedGuides();
+---
+<BaseLayout
+  title="Guides | Hivecrest Systems"
+  description="Practical guides for small businesses and public agencies on websites, online stores, software, AI automation and the cloud."
+  path="/guides"
+>
+<PageHeader book />
+
+<main>
+<PageIntro eyebrow="GUIDES" title="Guides" meta="Plain answers to the questions businesses ask before a technology project." />
+<div class="container guides">
+<ol class="guide-list">
+{guides.map((guide) => (
+<li class="guide-list__item">
+<p class="eyebrow">{guide.data.eyebrow}</p>
+<h2 class="guide-list__title"><a href={guidePath(guide)}>{guide.data.title}</a></h2>
+<p class="guide-list__text">{guide.data.description}</p>
+<p class="guide-list__meta">{formatDate(guide.data.published)} · {readingMinutes(guide)} min read</p>
+</li>
+))}
+</ol>
+</div>
+</main>
+
+<ContactFooter current="guides" />
+</BaseLayout>

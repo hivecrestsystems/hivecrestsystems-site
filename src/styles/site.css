@@ -97,6 +97,45 @@ body {
   background: var(--hc-night);
   color: var(--hc-light-text);
 }
+/* Homepage: the header bar stays at the top of the window while the page scrolls.
+   The phone menu panel hangs below it, so the header must not clip it. */
+.site-header--sticky {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  overflow: visible;
+}
+/* The header's height, set exactly by a script on the homepage (these are close
+   fallbacks). It sizes the hero, and keeps in-page links from landing under the header. */
+:root { --header-h: 92px; }
+@media (max-width: 429px) {
+  :root { --header-h: 84px; }
+}
+html:has(.site-header--sticky) { scroll-padding-top: var(--header-h); }
+
+/* Inner pages: the buttons beside the logo. The bar stays on one line, so the logo keeps
+   its size on most phones: below 520px the button labels are shortened, and on the guides
+   (which add a booking button) the logo is the way home below 720px. */
+.topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.site-header--sticky .topbar { flex-wrap: nowrap; }
+.topbar__actions .btn { white-space: nowrap; }
+.topbar__label-short { display: none; }
+@media (max-width: 719px) {
+  .topbar--book .topbar__home { display: none; }
+}
+@media (max-width: 519px) {
+  .topbar__label-long { display: none; }
+  .topbar__label-short { display: inline; }
+}
+/* The dark title band at the start of an inner page. */
+.page-intro {
+  background: var(--hc-night);
+  color: var(--hc-light-text);
+}
 .topbar {
   position: relative;
   display: flex;
@@ -177,6 +216,10 @@ body {
     background: var(--hc-charcoal);
     box-shadow: 0 24px 40px rgb(0 0 0 / 45%);
     font-size: 18px;
+    /* Scrolls on its own when it's taller than the screen, as on a phone held sideways. */
+    max-height: calc(100vh - var(--header-h));
+    max-height: calc(100svh - var(--header-h));
+    overflow-y: auto;
   }
   .js .main-nav__link {
     display: flex;
@@ -261,7 +304,9 @@ body {
 .hero-honeycomb {
   position: absolute;
   right: -80px;
-  top: 60px;
+  /* Measured from the top of the hero content (.hero__stage): 32px above it, which is
+     60px below the top of the header bar, as in the original design. */
+  top: -32px;
   width: 620px;
   height: 620px;
   pointer-events: none;
@@ -279,10 +324,10 @@ body {
   :root { --hero-comb-size: clamp(360px, 46vw, 480px); }
   .hero-honeycomb {
     right: -40px;
-    /* The second headline line is centred 226px (header, padding, eyebrow and gap)
-       plus 1.575 title sizes below the top of the header. The honey cell's centre
-       is 35% of the way down the drawing. */
-    top: calc(226px + 1.575 * var(--hero-title-size) - 0.35 * var(--hero-comb-size));
+    /* The second headline line is centred 134px (padding, eyebrow and gap) plus 1.575
+       title sizes below the top of the hero content. The honey cell's centre is 35% of
+       the way down the drawing. */
+    top: calc(134px + 1.575 * var(--hero-title-size) - 0.35 * var(--hero-comb-size));
     width: var(--hero-comb-size);
     height: var(--hero-comb-size);
   }
@@ -298,7 +343,26 @@ body {
     mask-image: linear-gradient(to right, rgb(0 0 0 / 15%), #000 65%);
   }
 }
-.hero { position: relative; }
+/* The hero fills the rest of the first screen below the header, with its content centred,
+   so the next section only shows once you scroll. svh is the screen height with a phone
+   browser's toolbars showing. */
+.hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: calc(100vh - var(--header-h));
+  min-height: calc(100svh - var(--header-h));
+  background: var(--hc-night);
+  color: var(--hc-light-text);
+}
+/* From 720px the honeycomb cluster is placed against the content, so it moves with it.
+   On phones the strip sits along the bottom of the hero instead. */
+.hero__stage { width: 100%; }
+@media (min-width: 720px) {
+  .hero__stage { position: relative; }
+}
 .hero__inner {
   display: flex;
   flex-direction: column;
@@ -380,7 +444,7 @@ body {
   gap: 16px;
 }
 .section-dark {
-  background: var(--hc-charcoal);
+  background: var(--hc-night);
   color: var(--hc-light-text);
 }
 .section-sand { background: var(--hc-sand); }
@@ -833,4 +897,179 @@ textarea.field__control { resize: vertical; }
 .legal__address a {
   color: var(--hc-charcoal);
   font-weight: 600;
+}
+
+/* ---------- Footer: where we work ---------- */
+/* Keep the crest at full size when the two lines wrap on phones. */
+.footer-bar__brand svg { flex-shrink: 0; }
+.footer-bar__lines {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.footer-bar__reach { font-size: 13px; }
+
+/* ---------- Guides ---------- */
+.guides { padding: 72px var(--hc-gutter) 112px; }
+.guide-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+  max-width: 820px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* Two columns on wide screens; the date line sits at the bottom so each row lines up. */
+@media (min-width: 1024px) {
+  .guide-list { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: none; }
+  .guide-list__meta { margin-top: auto; }
+}
+.guide-list__item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 28px;
+  background: var(--hc-white);
+  border: 1px solid var(--hc-card-border);
+  border-radius: var(--hc-radius-md);
+}
+.guide-list__title {
+  margin: 0;
+  font-family: var(--hc-font-mono);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1.25;
+}
+.guide-list__title a { text-decoration: none; }
+.guide-list__title a:hover { text-decoration: underline; }
+.guide-list__text {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--hc-body-gray);
+}
+.guide-list__meta {
+  margin: 0;
+  font-size: 14px;
+  color: var(--hc-stone);
+}
+
+/* Article page: same reading size as the privacy policy. */
+.article {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  padding: 48px var(--hc-gutter) 112px;
+}
+.breadcrumb { font-size: 15px; }
+.breadcrumb a { color: var(--hc-stone); }
+.prose {
+  max-width: 760px;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--hc-body-gray);
+}
+.prose > * { margin: 0 0 20px; }
+.prose > :last-child { margin-bottom: 0; }
+/* Links to a heading leave a little room under the sticky header. */
+.prose :is(h2, h3) { scroll-margin-top: 24px; }
+.prose h2 {
+  margin: 48px 0 14px;
+  font-family: var(--hc-font-mono);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1.25;
+  color: var(--hc-charcoal);
+}
+.prose h3 {
+  margin: 32px 0 10px;
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--hc-charcoal);
+}
+.prose strong { color: var(--hc-charcoal); }
+.prose ul,
+.prose ol { padding-left: 22px; }
+.prose li + li { margin-top: 8px; }
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+}
+.prose th,
+.prose td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--hc-card-border);
+  text-align: left;
+  vertical-align: top;
+}
+.prose th { color: var(--hc-charcoal); font-weight: 600; }
+.prose blockquote {
+  padding: 16px 20px;
+  border-left: 4px solid var(--hc-honey);
+  background: var(--hc-white);
+}
+.article-cta {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 760px;
+  box-sizing: border-box;
+  padding: 32px;
+  background: var(--hc-white);
+  border: 1px solid var(--hc-card-border);
+  border-radius: var(--hc-radius-md);
+}
+.article-cta p {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--hc-body-gray);
+}
+/* Wide tables scroll inside the article instead of widening the page on phones. */
+.prose table { display: block; overflow-x: auto; }
+/* On phones, each table row becomes a card: the first cell is its heading and the
+   others carry their column name (data-label, added at build time). */
+@media (max-width: 640px) {
+  .prose table,
+  .prose tbody,
+  .prose tr,
+  .prose td { display: block; }
+  .prose table { overflow: visible; }
+  /* Column headings stay available to screen readers. */
+  .prose thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .prose tr {
+    padding: 14px 16px;
+    background: var(--hc-white);
+    border: 1px solid var(--hc-card-border);
+    border-radius: var(--hc-radius-sm);
+  }
+  .prose tr + tr { margin-top: 12px; }
+  .prose td {
+    padding: 4px 0;
+    border: 0;
+  }
+  .prose td:first-child {
+    padding-bottom: 8px;
+    font-weight: 600;
+    color: var(--hc-charcoal);
+  }
+  .prose td:not(:first-child)::before {
+    content: attr(data-label);
+    display: block;
+    font-family: var(--hc-font-mono);
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--hc-stone);
+  }
 }

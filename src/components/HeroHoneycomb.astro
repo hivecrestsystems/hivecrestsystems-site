@@ -28,7 +28,7 @@ const CLUSTER_HOME = '65.98,25.80 73.95,30.40 73.95,39.60 65.98,44.20 58.01,39.6
 // Phone strip: rows of pointy-top cells, each about 45px wide so it can be tapped.
 const R = 28; // cell radius in px
 const ROWS = 3;
-const COLS = 15; // wide enough for any phone; the header crops the rest
+const COLS = 15; // wide enough for any phone; the hero crops the rest
 const HOME = { row: 1, col: 12 }; // about 120px in from the right edge
 const COL_STEP = Math.sqrt(3) * R;
 const ROW_STEP = 1.5 * R;
@@ -71,7 +71,7 @@ const stripHome = stripCells.find((c) => c.home)!.points;
   // and fades, and it glides home 0.7s after the pointer leaves the cells. On touch
   // screens it follows taps on a cell and stays there. Nothing moves with reduced motion.
   const HOME_DELAY_MS = 700;
-  const header = document.querySelector<HTMLElement>('.site-header');
+  const hero = document.querySelector<HTMLElement>('.hero');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   type Cell = { el: SVGPolygonElement; points: number[][]; x: number; y: number };
@@ -139,11 +139,11 @@ const stripHome = stripCells.find((c) => c.home)!.points;
   const combs = [...document.querySelectorAll<SVGSVGElement>('.hero-honeycomb, .hero-strip')].map(makeComb);
   const shownComb = () => combs.find((c) => c.shown());
 
-  if (header && combs.length > 0) {
+  if (hero && combs.length > 0) {
     // Mouse: follow the pointer only while it is over a cell, checked once per frame.
     let pending: PointerEvent | null = null;
     let frame = 0;
-    header.addEventListener('pointermove', (event) => {
+    hero.addEventListener('pointermove', (event) => {
       if (event.pointerType !== 'mouse' || reduceMotion.matches) return;
       pending = event;
       frame ||= requestAnimationFrame(() => {
@@ -155,14 +155,14 @@ const stripHome = stripCells.find((c) => c.home)!.points;
         else comb.goHomeSoon();
       });
     });
-    header.addEventListener('pointerleave', (event) => {
+    hero.addEventListener('pointerleave', (event) => {
       pending = null;
       if (event.pointerType === 'mouse' && !reduceMotion.matches) shownComb()?.goHomeNow();
     });
 
     // Touch and pen: a tap on a cell moves the outline there. Taps count when the finger
     // lifts; a finger that starts scrolling is cancelled by the browser and never lifts here.
-    header.addEventListener('pointerup', (event) => {
+    hero.addEventListener('pointerup', (event) => {
       if (event.pointerType === 'mouse' || reduceMotion.matches) return;
       if ((event.target as Element).closest('a, button')) return;
       const comb = shownComb();

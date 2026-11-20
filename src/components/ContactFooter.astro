@@ -1,0 +1,21 @@
+---
+// Footer with the call to action ("Have a system that needs building?"), used on the
+// homepage and the guides. The privacy policy uses the compact FooterBar on its own.
+import FooterBar from './FooterBar.astro';
+
+interface Props {
+  /** Which footer link's page is open, if any. */
+  current?: 'guides' | 'privacy';
+}
+const { current } = Astro.props;
+---
+<footer id="contact" class="site-footer">
+<div class="container footer-main">
+<div class="footer-cta">
+<h2 class="footer-cta__title">Have a system that needs building?</h2>
+<p class="footer-cta__text">Tell us what you're working on, and we'll set up a free 30-minute call.</p>
+<a href="mailto:hello@hivecrestsystems.com" class="btn btn--honey footer-cta__email">hello@hivecrestsystems.com</a>
+</div>
+<FooterBar variant="ruled" current={current} />
+</div>
+</footer>

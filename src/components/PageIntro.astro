@@ -1,0 +1,17 @@
+---
+// Dark title band at the start of an inner page's <main>: eyebrow, title and meta line.
+interface Props {
+  eyebrow: string;
+  title: string;
+  /** Line under the title, such as dates. */
+  meta?: string;
+}
+const { eyebrow, title, meta } = Astro.props;
+---
+<div class="page-intro">
+<div class="container page-hero">
+<p class="eyebrow eyebrow--honey">{eyebrow}</p>
+<h1 class="page-hero__title">{title}</h1>
+{meta && <p class="page-hero__meta">{meta}</p>}
+</div>
+</div>

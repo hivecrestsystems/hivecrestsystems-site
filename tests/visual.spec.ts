@@ -13,7 +13,12 @@ const VIEWPORTS = [
   { name: 'desktop', width: 1440, height: 900 },
 ];
 
-for (const p of PAGES) {
+// Every guide uses the same layout, so the first one stands in for all of them: screenshots
+// of each guide would add megabytes to the repository with every wording change. The other
+// checks (accessibility, phone widths, links, markup) still run on every guide.
+const SCREENSHOT_PAGES = PAGES.filter((p) => !p.path.startsWith('/guides/') || p.slug === 'guide-website-cost');
+
+for (const p of SCREENSHOT_PAGES) {
   for (const vp of VIEWPORTS) {
     test(`${p.slug} looks right on ${vp.name}`, async ({ page }) => {
       await page.setViewportSize({ width: vp.width, height: vp.height });

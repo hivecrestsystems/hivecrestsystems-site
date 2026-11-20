@@ -16,9 +16,11 @@ interface Props {
   description: string;
   /** Site-relative path of the page, e.g. "/" or "/privacy". */
   path: string;
+  /** Open Graph type: "article" for guides, "website" for everything else. */
+  ogType?: 'website' | 'article';
 }
 
-const { title, description, path } = Astro.props;
+const { title, description, path, ogType = 'website' } = Astro.props;
 const canonical = new URL(path, Astro.site).href;
 ---
 <!doctype html>
@@ -31,7 +33,7 @@ const canonical = new URL(path, Astro.site).href;
 <title>{title}</title>
 <meta name="description" content={description}>
 <link rel="canonical" href={canonical}>
-<meta property="og:type" content="website">
+<meta property="og:type" content={ogType}>
 <meta property="og:site_name" content="Hivecrest Systems">
 <meta property="og:title" content={title}>
 <meta property="og:description" content={description}>
@@ -39,9 +41,9 @@ const canonical = new URL(path, Astro.site).href;
 <meta property="og:image" content="https://hivecrestsystems.com/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#141416">
-<link rel="icon" href="assets/favicon.ico" sizes="any">
-<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="icon" href="/assets/favicon.ico" sizes="any">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 {fontPreloads.map((href) => <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />)}
 <slot name="head" />
 </head>

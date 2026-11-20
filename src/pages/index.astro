@@ -1,9 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import FooterBar from '../components/FooterBar.astro';
 import HeroHoneycomb from '../components/HeroHoneycomb.astro';
 import SiteLogo from '../components/SiteLogo.astro';
+import HeaderHeight from '../components/HeaderHeight.astro';
 import { PROJECT_TYPES, TURNSTILE_ACTION, TURNSTILE_SITE_KEY } from '../data/portfolio-form';
+import { SERVICES, homepageStructuredData } from '../data/seo';
+import ContactFooter from '../components/ContactFooter.astro';
 
 // Phrases typed after "$ hivecrest builds" in the hero.
 const typedPhrases = [
@@ -24,38 +26,8 @@ const navLinks = [
   { href: '#about', label: 'About', num: '05' },
 ];
 
-const services = [
-  {
-    title: 'Websites & web apps',
-    text: 'Fast, accessible websites and web applications that are easy to find and easy to update.',
-    tags: 'Redesigns · Accessibility · SEO',
-  },
-  {
-    title: 'E-commerce & Shopify',
-    text: 'Shopify stores, theme customization and custom Shopify apps that make selling simpler.',
-    tags: 'Store builds · Custom apps · Integrations',
-  },
-  {
-    title: 'Mobile & custom software',
-    text: 'iOS and Android apps from one codebase, plus internal tools and dashboards for your team.',
-    tags: 'React Native · Internal tools · APIs',
-  },
-  {
-    title: 'AI & automation',
-    text: 'Assistants and automated workflows that answer questions, book appointments and follow up for you.',
-    tags: 'Chat assistants · Workflows · Integrations',
-  },
-  {
-    title: 'Cloud & IT consulting',
-    text: 'Cloud setup, migrations and practical technical guidance for growing teams.',
-    tags: 'AWS · Azure · Microsoft 365 · Google Workspace',
-  },
-  {
-    title: 'Care & support plans',
-    text: 'Hosting, updates, monitoring and fixes on a predictable monthly plan.',
-    tags: 'Hosting · Monitoring · Maintenance',
-  },
-];
+// Service cards; the same list feeds the structured data in src/data/seo.ts.
+const services = SERVICES;
 
 const steps = [
   { title: 'Discover', text: "We learn how your business runs and what's slowing it down." },
@@ -85,9 +57,8 @@ const govCodes = [
   description="Hivecrest Systems designs, builds and supports the websites, software, cloud and automation that businesses and public agencies run on."
   path="/"
 >
-<header class="site-header">
-<HeroHoneycomb />
-
+<script type="application/ld+json" slot="head" set:html={JSON.stringify(homepageStructuredData())} />
+<header class="site-header site-header--sticky">
 <div class="container topbar topbar--menu">
 <SiteLogo href="#top" />
 <button type="button" id="menu-toggle" class="menu-toggle" aria-expanded="false" aria-controls="main-nav">
@@ -102,8 +73,13 @@ const govCodes = [
 <a href="#contact" class="btn btn--sm btn--honey main-nav__cta"><svg class="main-nav__cta-icon" viewBox="0 0 100 100" width="18" height="18" aria-hidden="true"><polygon points="50,6 88,28 88,72 50,94 12,72 12,28" fill="#18181B"></polygon></svg>Book a call</a>
 </nav>
 </div>
+</header>
+<HeaderHeight />
 
+<main id="main">
 <section id="top" class="hero">
+<div class="hero__stage">
+<HeroHoneycomb />
 <div class="container hero__inner">
 <p class="eyebrow eyebrow--honey">IT SERVICES · IT CONSULTING</p>
 <h1 class="hero__title"><span class="hero__title-line">Strong systems,</span> <span class="hero__title-line">built cell by cell.</span></h1>
@@ -117,10 +93,8 @@ const govCodes = [
 <a href="#services" class="btn btn--ghost-dark">See what we build</a>
 </div>
 </div>
+</div>
 </section>
-</header>
-
-<main id="main">
 <section id="services" class="container services">
 <div class="section-head">
 <p class="eyebrow">01 / SERVICES</p>
@@ -246,16 +220,7 @@ const govCodes = [
 <a href="#contact" id="float-cta" class="float-cta"><svg viewBox="0 0 100 100" width="18" height="18" aria-hidden="true"><polygon points="50,6 88,28 88,72 50,94 12,72 12,28" fill="#18181B"></polygon></svg>Book a call</a>
 </main>
 
-<footer id="contact" class="site-footer">
-<div class="container footer-main">
-<div class="footer-cta">
-<h2 class="footer-cta__title">Have a system that needs building?</h2>
-<p class="footer-cta__text">Tell us what you're working on, and we'll set up a free 30-minute call.</p>
-<a href="mailto:hello@hivecrestsystems.com" class="btn btn--honey footer-cta__email">hello@hivecrestsystems.com</a>
-</div>
-<FooterBar variant="ruled" />
-</div>
-</footer>
+<ContactFooter />
 
 <script>
   // Phone menu: the Menu button shows and hides the main links (see .menu-toggle in site.css).
@@ -294,10 +259,15 @@ const govCodes = [
     let pastHero = false;
     let atFooter = false;
     const update = () => floatCta.classList.toggle('is-visible', pastHero && !atFooter);
-    new IntersectionObserver(([entry]) => {
-      pastHero = !entry.isIntersecting && entry.boundingClientRect.top < 0;
-      update();
-    }).observe(heroButtons);
+    // The buttons count as gone once they scroll under the sticky header.
+    const headerHeight = document.querySelector<HTMLElement>('.site-header')?.offsetHeight ?? 0;
+    new IntersectionObserver(
+      ([entry]) => {
+        pastHero = !entry.isIntersecting && entry.boundingClientRect.top < (entry.rootBounds?.top ?? 0);
+        update();
+      },
+      { rootMargin: `-${headerHeight}px 0px 0px 0px` },
+    ).observe(heroButtons);
     new IntersectionObserver(([entry]) => {
       atFooter = entry.isIntersecting;
       update();
